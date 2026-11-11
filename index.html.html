@@ -1,0 +1,3902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>월별 결산 및 지출결의서 관리 시스템</title>
+<style>
+:root {
+  --bg-color: #F8FAFC;
+  --surface-color: #FFFFFF;
+  --ink-primary: #0F172A;
+  --ink-secondary: #64748B;
+  --border-color: #CBD5E1;
+  --accent-color: #0F52BA;
+  --accent-light: #EFF6FF;
+  --danger-color: #EF4444;
+  --danger-light: #FEF2F2;
+  --success-color: #10B981;
+  --success-light: #ECFDF5;
+  --warning-color: #F59E0B;
+  --warning-light: #FFFBEB;
+  --support-color: #7C3AED;
+  --bar-done: #10B981;
+  --bar-pending: #F59E0B;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--ink-primary);
+  line-height: 1.5;
+  padding-bottom: 60px;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+}
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.view-tabs {
+  display: flex;
+  background-color: #E2E8F0;
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 12px;
+  gap: 2px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tab-btn {
+  flex: 1;
+  min-width: 82px;
+  padding: 10px 4px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  background-color: #FFFFFF;
+  color: var(--ink-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.backup-bar {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.backup-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-secondary);
+}
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+}
+.backup-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.btn-backup {
+  background-color: #F1F5F9;
+  border: 1px solid var(--border-color);
+  color: var(--ink-primary);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.btn-backup:hover {
+  background-color: #E2E8F0;
+}
+.btn-backup.primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #fff;
+}
+.btn-backup.save-point {
+  background-color: #059669;
+  border-color: #059669;
+  color: #fff;
+}
+
+.month-selector-bar {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.btn-nav-month {
+  background: #F1F5F9;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-nav-month:active {
+  background-color: #E2E8F0;
+}
+.current-month-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.month-input {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  outline: none;
+}
+
+.card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.card-title {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.sub-view-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+.btn-back-main {
+  background: none;
+  border: none;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--accent-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.month-summary-card {
+  background: linear-gradient(135deg, #0F52BA 0%, #1E3A8A 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(15, 82, 186, 0.15);
+}
+.month-summary-title {
+  font-size: 12.5px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+.month-summary-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.month-spent-val {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.month-remain-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+.month-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 10.5px;
+}
+.month-summary-grid span {
+  display: block;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.month-summary-grid strong {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.category-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.category-card-header {
+  padding: 14px;
+  cursor: pointer;
+  background-color: #fff;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+.category-card-header:hover {
+  background-color: #F8FAFC;
+}
+.category-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.category-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 65%;
+}
+.toggle-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background-color: #EFF6FF;
+  color: var(--accent-color);
+  font-size: 11px;
+  font-weight: 700;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  flex-shrink: 0;
+}
+.toggle-badge.open {
+  transform: rotate(90deg);
+  background-color: #1E293B;
+  color: #fff;
+}
+.category-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  overflow-wrap: anywhere;
+}
+.category-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-action-icon {
+  background: none;
+  border: none;
+  color: var(--ink-secondary);
+  font-size: 11.5px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background-color: #F1F5F9;
+}
+.btn-action-icon:hover {
+  color: var(--ink-primary);
+  background-color: #E2E8F0;
+}
+.btn-action-icon.del:hover {
+  color: var(--danger-color);
+  background-color: var(--danger-light);
+}
+
+.btn-go-detail {
+  background-color: var(--accent-light);
+  color: var(--accent-color);
+  border: 1px solid #BFDBFE;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.btn-go-detail:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.category-amounts {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.stacked-progress-container {
+  height: 8px;
+  background-color: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+.bar-segment-done {
+  height: 100%;
+  background-color: var(--bar-done);
+  transition: width 0.3s ease;
+}
+.bar-segment-pending {
+  height: 100%;
+  background-color: var(--bar-pending);
+  transition: width 0.3s ease;
+}
+.bar-legend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 11.5px;
+}
+.legend-group {
+  display: flex;
+  gap: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.category-card-body {
+  border-top: 1px solid var(--border-color);
+  background-color: #F8FAFC;
+  padding: 14px;
+  display: none;
+}
+.category-card-body.open {
+  display: block;
+}
+.accordion-header-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.col-span-2 {
+  grid-column: span 2;
+}
+.form-group label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  margin-bottom: 3px;
+}
+.form-control {
+  width: 100%;
+  height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13.5px;
+  background-color: #fff;
+  color: var(--ink-primary);
+  outline: none;
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+}
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.multi-preview-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+}
+.multi-preview-thumb-box {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  background: #f1f5f9;
+}
+.multi-preview-thumb-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+.multi-preview-thumb-box .btn-remove-single {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 16px;
+  height: 16px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-btn-row {
+  display: flex;
+  gap: 8px;
+}
+.btn-primary {
+  flex: 1;
+  height: 42px;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.btn-primary:active {
+  opacity: 0.9;
+}
+.btn-secondary {
+  height: 42px;
+  padding: 0 14px;
+  background-color: #F1F5F9;
+  color: var(--ink-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.expense-item {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.expense-item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.expense-desc-wrap {
+  flex: 1;
+}
+.expense-desc {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-primary);
+  overflow-wrap: anywhere;
+}
+.expense-amount {
+  font-size: 14.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.receipt-thumbs-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.receipt-thumb-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: #F1F5F9;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.receipt-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.receipt-thumb-btn span {
+  font-size: 9.5px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.receipt-count-badge {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  background: rgba(15, 82, 186, 0.9);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+}
+.expense-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--ink-secondary);
+  border-top: 1px dashed #F1F5F9;
+  padding-top: 5px;
+}
+.buyer-badge {
+  background-color: #F1F5F9;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.buyer-badge.me {
+  background-color: #EEF2FF;
+  color: #4F46E5;
+  font-weight: 600;
+}
+.status-badge-btn {
+  border: none;
+  padding: 3px 7px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-done {
+  background-color: var(--success-light);
+  color: var(--success-color);
+}
+.status-pending {
+  background-color: var(--warning-light);
+  color: var(--warning-color);
+}
+.status-self {
+  background-color: #F1F5F9;
+  color: var(--ink-secondary);
+  cursor: default;
+}
+.empty-state {
+  text-align: center;
+  padding: 24px 14px;
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--surface-color);
+  line-height: 1.6;
+}
+.form-msg {
+  font-size: 11.5px;
+  color: var(--danger-color);
+  margin-top: 3px;
+  display: none;
+}
+
+.sheet-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+.report-view-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.dept-selector-group {
+  display: inline-flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px 6px;
+  gap: 6px;
+}
+.dept-selector-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+.dept-select {
+  border: 1px solid var(--border-color);
+  background-color: #F8FAFC;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-color);
+  outline: none;
+}
+.report-btn-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.btn-report-action {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  color: #fff;
+  white-space: nowrap;
+}
+.btn-report-action.print {
+  background-color: #1E293B;
+}
+.btn-report-action.excel {
+  background-color: #15803D;
+}
+.btn-report-action:active {
+  opacity: 0.9;
+}
+
+.report-sheet-wrapper {
+  background-color: #fff;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 24px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-sizing: border-box;
+  min-width: 620px;
+}
+
+.print-page-box {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "Malgun Gothic", "Pretendard", sans-serif;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.report-title-row {
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 22px;
+}
+.report-title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-decoration: underline;
+  text-underline-offset: 7px;
+  color: #000;
+}
+.report-approval-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  padding-right: 2px;
+}
+.approval-table {
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 12.5px;
+  box-sizing: border-box;
+  table-layout: fixed;
+}
+.approval-table th, .approval-table td {
+  border: 1.5px solid #000;
+}
+.approval-header-cell {
+  background-color: #fff;
+  font-weight: 700;
+  width: 68px;
+  height: 26px;
+}
+.approval-stamp-cell {
+  height: 60px;
+}
+.approval-side-title {
+  width: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 0 4px;
+}
+.report-main-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  table-layout: fixed;
+  border: 2px solid #000;
+}
+.report-main-table th {
+  border: 1.5px solid #000;
+  background-color: #FAFAFA;
+  padding: 9px 4px;
+  font-weight: 700;
+  text-align: center;
+}
+.report-main-table td {
+  border: 1px dotted #444;
+  padding: 4px 8px;
+  height: 38px;
+  max-height: 38px;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.report-main-table tr.solid-row td {
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
+  height: 42px;
+  font-size: 14px;
+}
+.col-border-right {
+  border-right: 2px solid #000 !important;
+}
+.text-center { text-align: center; }
+.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+.report-num { font-weight: 700; }
+.report-remain-box-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-right: 2px;
+}
+.remain-table {
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: center;
+}
+.remain-table th, .remain-table td {
+  border: 1.5px solid #000;
+  padding: 6px 12px;
+}
+.remain-table th {
+  background-color: #FAFAFA;
+  font-weight: 700;
+  width: 85px;
+}
+.remain-table td {
+  width: 125px;
+  text-align: right;
+  font-weight: 700;
+}
+.report-footer {
+  text-align: center;
+  margin-top: 42px;
+  padding-bottom: 20px;
+}
+.report-statement {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  margin-bottom: 26px;
+}
+.report-date-str {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+/* 2. 지출결의서 서식 */
+.voucher-print-box {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "Malgun Gothic", "Pretendard", sans-serif;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 258mm;
+}
+
+.v-top-box {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  margin-bottom: 16px;
+  table-layout: fixed;
+}
+.v-top-box td {
+  border: 1.5px solid #000;
+  padding: 0;
+}
+.v-title-cell {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  padding-left: 8px;
+  width: 44%;
+  white-space: nowrap !important;
+  word-break: keep-all;
+}
+.v-approval-side {
+  width: 26px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  padding: 0 4px;
+}
+.v-approval-header {
+  height: 32px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #fff;
+  width: 14%;
+}
+.v-approval-stamp {
+  height: 72px;
+}
+
+.v-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  margin-bottom: 18px;
+  font-size: 13.5px;
+  table-layout: fixed;
+}
+.v-meta-table th, .v-meta-table td {
+  border: 1.5px solid #000;
+  padding: 8px 6px;
+  height: 44px;
+  vertical-align: middle;
+  overflow: hidden;
+}
+.v-meta-table th {
+  background-color: #FAFAFA;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.v-main-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #000;
+  font-size: 14px;
+  table-layout: fixed;
+}
+.v-main-table th, .v-main-table td {
+  border: 1.5px solid #000;
+  padding: 6px 10px;
+  height: 46px;
+  vertical-align: middle;
+  overflow: hidden;
+}
+.v-main-table th {
+  background-color: #FAFAFA;
+  text-align: center;
+  font-weight: 700;
+  height: 40px;
+}
+
+.v-footer-area {
+  text-align: center !important;
+  margin-top: 36px;
+  padding-bottom: 24px;
+}
+.v-claim-statement {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center !important;
+  letter-spacing: 0.5px;
+}
+.v-date-str {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 26px;
+  text-align: center !important;
+  letter-spacing: 1.5px;
+}
+.v-claimant-row {
+  display: flex;
+  justify-content: flex-end !important;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  gap: 20px;
+  padding-right: 48px;
+}
+
+.voucher-setting-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+}
+.voucher-setting-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+@media (max-width: 600px) {
+  .voucher-setting-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 3. 영수증 증빙 모아보기 서식 (스마트 반응형 2열 그리드) */
+.receipt-sheet-header {
+  text-align: center;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #000;
+}
+.receipt-sheet-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.receipt-category-group {
+  margin-bottom: 18px;
+}
+/* 항목 제목 바: 시인성 극대화 */
+.receipt-category-title-bar {
+  background-color: #EEF2FF;
+  border-left: 5px solid var(--accent-color);
+  padding: 8px 14px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1E293B;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  border-top: 1px solid #CBD5E1;
+  border-right: 1px solid #CBD5E1;
+  border-bottom: 1px solid #CBD5E1;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+
+/* 항목 내 세부 지출 카드들을 2열로 배치하는 그리드 */
+.receipt-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  page-break-inside: auto !important;
+  break-inside: auto !important;
+}
+
+/* 각 세부 지출 1건을 완전히 둘러싸는 독립 카드 (구별 100% 보장) */
+.expense-group-card {
+  border: 1.5px solid #000;
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  display: flex;
+  flex-direction: column;
+}
+/* 혼자 남은 단일 지출건이거나 3장 이상인 대형 지출건은 가로 100%(span 2)로 꽉 채움 */
+.expense-group-card.span-full {
+  grid-column: span 2;
+}
+
+/* 세부 지출 헤더: 지출 적요와 금액이 1번만 단일 표기되어 명확히 구별됨 */
+.expense-group-header {
+  background-color: #F8FAFC;
+  border-bottom: 1.2px solid #000;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
+}
+.expense-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.expense-title-text {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0F172A;
+  overflow-wrap: anywhere;
+}
+.expense-meta-info {
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+.expense-meta-info strong {
+  color: var(--ink-primary);
+}
+.expense-header-right {
+  display: flex;
+  align-items: center;
+}
+.expense-amount-badge {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent-color);
+  font-variant-numeric: tabular-nums;
+  background: #EFF6FF;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #BFDBFE;
+  white-space: nowrap;
+}
+
+/* 카드 내부 영수증 사진 배치 그리드 */
+.expense-photos-grid {
+  display: grid;
+  padding: 6px;
+  gap: 6px;
+  background-color: #FFFFFF;
+  flex: 1;
+}
+.expense-photos-grid.cols-1 {
+  grid-template-columns: 1fr;
+}
+.expense-photos-grid.cols-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.expense-photos-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.receipt-photo-box {
+  border: 1px dashed #CBD5E1;
+  background-color: #FAFAFA;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  transition: border-color 0.15s ease;
+}
+.receipt-photo-box:hover {
+  border-color: var(--accent-color);
+}
+.receipt-photo-box img {
+  width: 100%;
+  height: 185px;
+  max-height: 185px;
+  object-fit: contain;
+  display: block;
+}
+.receipt-photo-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  margin-top: 3px;
+  text-align: center;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 8mm 8mm 8mm;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html, body {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .no-print, .toast-msg, #toast {
+    display: none !important;
+  }
+  .sheet-scroll-container {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+  .report-sheet-wrapper {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    min-width: 100% !important;
+  }
+  .print-page-box {
+    height: 278mm !important;
+    max-height: 278mm !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+  .voucher-print-box {
+    min-height: 278mm !important;
+    height: 278mm !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 인쇄 시 1행 2열로 꽉 차게 들어가며 여백 낭비 제로 및 카드 쪼개짐 완벽 방지 */
+  .receipt-category-title-bar {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+  .receipt-cards-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .expense-group-card {
+    border: 1.5px solid #000 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .expense-group-card.span-full {
+    grid-column: span 2 !important;
+  }
+  .expense-group-header {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+  .receipt-photo-box {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .receipt-photo-box img {
+    height: 180px !important;
+    max-height: 180px !important;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 92vw;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-body {
+  padding: 14px;
+  overflow-y: auto;
+  text-align: center;
+}
+.modal-body img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.backup-modal-card {
+  width: 560px;
+  max-width: 94vw;
+}
+.snapshot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 8px;
+  text-align: left;
+}
+.snapshot-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 9px 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  background-color: #FAFAFA;
+}
+.snapshot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.snapshot-date {
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+.snapshot-meta {
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+.snapshot-actions {
+  display: flex;
+  gap: 5px;
+}
+.toast-msg {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(15, 23, 42, 0.94);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 2000;
+  display: none;
+  animation: fadeInOut 2.5s ease forwards;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="view-tabs no-print">
+    <button type="button" class="tab-btn active" id="tabBtnManage" onclick="switchView('manage')">지출 관리</button>
+    <button type="button" class="tab-btn" id="tabBtnVoucher" onclick="switchView('voucher')">A4 지출결의서</button>
+    <button type="button" class="tab-btn" id="tabBtnPreview" onclick="switchView('preview')">A4 결산보고서</button>
+    <button type="button" class="tab-btn" id="tabBtnReceipts" onclick="switchView('receipts')"> 영수증 증빙 모아보기</button>
+  </div>
+
+  <div class="backup-bar no-print">
+    <div class="backup-status">
+      <span class="status-indicator" id="autoSaveIndicator"></span>
+      <span id="autoSaveStatusText">실시간 자동 저장됨</span>
+    </div>
+    <div class="backup-btn-group">
+      <button type="button" class="btn-backup save-point" onclick="createManualBackup()"> 지금 시점 백업 저장</button>
+      <button type="button" class="btn-backup" onclick="openRestoreModal()"> 백업 내역 (<span id="backupCountBadge">0</span>)</button>
+      <button type="button" class="btn-backup primary" onclick="exportBackupFile()"> 파일저장 (.json)</button>
+    </div>
+  </div>
+
+  <div class="month-selector-bar no-print" id="monthSelectorBar">
+    <button type="button" class="btn-nav-month" onclick="shiftMonth(-1)" title="이전 달">‹</button>
+    <div class="current-month-display">
+      <input type="month" id="selectedMonthInput" class="month-input" onchange="onMonthInputChange(this.value)">
+    </div>
+    <button type="button" class="btn-nav-month" onclick="shiftMonth(1)" title="다음 달">›</button>
+  </div>
+
+  <!-- 1. 지출 관리 메인 화면 -->
+  <div id="viewManageArea">
+    <section class="month-summary-card">
+      <div class="month-summary-title"><span id="bannerMonthTitle"></span> 수입 및 결산 현황</div>
+      <div class="month-summary-main">
+        <span class="month-spent-val" id="bannerTotalSpent">0원</span>
+        <span class="month-remain-val" id="bannerTotalRemain">잔액 0원</span>
+      </div>
+      <div class="month-summary-grid">
+        <div><span>총 재원 (예산+찬조)</span><strong id="bannerTotalIncome">0원</strong></div>
+        <div><span>총 지출 (집행)</span><strong id="bannerTotalExpense">0원</strong></div>
+        <div><span>송금완료 / 본인</span><strong id="bannerDoneTransfers" style="color: #6EE7B7;">0원</strong></div>
+        <div><span>송금 대기</span><strong id="bannerPendingTransfers" style="color: #FCD34D;">0원</strong></div>
+      </div>
+    </section>
+
+    <section class="card" id="categoryFormCard">
+      <h2 class="card-title" id="catFormTitle" style="margin-bottom: 12px;">새 예산 항목 추가</h2>
+      <div class="form-grid">
+        <div class="form-group col-span-2">
+          <label for="catName">항목명</label>
+          <input type="text" id="catName" class="form-control" placeholder="예: 간식비, 물품구매, 활동비 등">
+        </div>
+        <div class="form-group">
+          <label for="catBudget">배정 예산 (원)</label>
+          <input type="number" id="catBudget" class="form-control" placeholder="0" min="0" step="1000">
+        </div>
+        <div class="form-group">
+          <label for="catSupport">찬조금 (원) <span style="font-size: 11px; color: var(--support-color); font-weight: normal;">*참고용·잔액반영</span></label>
+          <input type="number" id="catSupport" class="form-control" placeholder="0" min="0" step="1000">
+        </div>
+        <div class="col-span-2">
+          <div id="catErrorMsg" class="form-msg">항목명과 예산 금액을 올바르게 입력해 주세요.</div>
+        </div>
+        <div class="form-group col-span-2 form-btn-row">
+          <button type="button" id="btnSubmitCat" class="btn-primary" onclick="handleSaveCategory()">+ 항목 등록하기</button>
+          <button type="button" id="btnCancelCatEdit" class="btn-secondary" style="display:none;" onclick="cancelCategoryEdit()">취소</button>
+        </div>
+      </div>
+    </section>
+
+    <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size: 14px; font-weight: 700;">항목별 현황 (클릭 시 세부내역 확인)</span>
+      <span id="catTotalSummary" style="font-size: 12px; color: var(--ink-secondary);"></span>
+    </div>
+
+    <div id="categoryCardsContainer"></div>
+  </div>
+
+  <!-- 2. 세부 지출 작성 화면 -->
+  <div id="viewDetailInputArea" style="display: none;">
+    <div class="sub-view-nav">
+      <button type="button" class="btn-back-main" onclick="backToMainManage()">‹ 항목 목록으로 돌아가기</button>
+      <span id="detailViewNavTitle" style="font-weight: 700; font-size: 15px;"></span>
+    </div>
+
+    <section class="card" id="expenseFormCard">
+      <h2 class="card-title" id="expFormTitle" style="margin-bottom: 12px;">+ 세부 지출 내역 등록</h2>
+      <div class="form-grid">
+        <div class="form-group col-span-2">
+          <label>지출 세부 내용</label>
+          <input type="text" id="subExpDesc" class="form-control" placeholder="예: 간식 구매, 교재 구매 등">
+        </div>
+        <div class="form-group">
+          <label>지출 금액 (원)</label>
+          <input type="number" id="subExpAmount" class="form-control" placeholder="0" min="0" step="100">
+        </div>
+        <div class="form-group">
+          <label>지출 일자</label>
+          <input type="date" id="subExpDate" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>실 결제자</label>
+          <input type="text" id="subExpBuyer" class="form-control" placeholder="이름 (직접결제시 '본인')">
+        </div>
+        <div class="form-group">
+          <label>송금 상태</label>
+          <select id="subExpStatus" class="form-control">
+            <option value="pending">송금 필요 (미완료)</option>
+            <option value="done">송금 완료</option>
+            <option value="self">본인 직접 지출</option>
+          </select>
+        </div>
+        <div class="form-group col-span-2">
+          <label>영수증 사진 첨부 (다중선택 가능 · 모바일/카메라/갤러리)</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="subExpReceipt" class="form-control" accept="image/*" multiple style="padding-top: 6px;" onchange="handleSubReceiptMultiSelect(this)">
+            <div id="subFormMultiPreviewStrip" class="multi-preview-strip"></div>
+            <button type="button" id="subBtnClearAllReceipts" class="btn-action-icon del" style="display:none; align-self: flex-start;" onclick="clearAllSubReceiptImages()">영수증 전체 삭제</button>
+          </div>
+          <div id="subExpErrorMsg" class="form-msg">내용, 금액, 일자, 결제자를 모두 입력해 주세요.</div>
+        </div>
+        <div class="form-group col-span-2 form-btn-row">
+          <button type="button" id="btnSubmitSubExp" class="btn-primary" onclick="handleSaveSubExpense()">내역 저장</button>
+          <button type="button" id="btnCancelSubExpEdit" class="btn-secondary" style="display:none;" onclick="cancelSubExpenseEdit()">취소</button>
+        </div>
+      </div>
+    </section>
+
+    <div style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-size: 15px; font-weight: 700;">해당 월 등록된 세부 지출 목록</h3>
+      <span id="subDetailExpenseCount" style="font-size: 13px; color: var(--ink-secondary);">0건</span>
+    </div>
+    <div id="subExpenseListContainer"></div>
+  </div>
+
+  <!-- 3. A4 지출결의서 양식 뷰 -->
+  <div id="viewVoucherPreview" style="display: none;">
+    <div class="report-view-actions no-print">
+      <div class="dept-selector-group">
+        <label for="voucherDeptSelect">시행부서:</label>
+        <select id="voucherDeptSelect" class="dept-select" onchange="onVoucherDeptChange(this.value)">
+          <option value="유초등부">유초등부</option>
+          <option value="중고등부">중고등부</option>
+        </select>
+      </div>
+      <div class="report-btn-group">
+        <button type="button" class="btn-report-action excel" onclick="downloadVoucherExcelXml()"> 지출결의서 엑셀 저장</button>
+        <button type="button" class="btn-report-action print" onclick="printCurrentView('지출결의서')">️ 지출결의서 인쇄 / PDF 저장</button>
+      </div>
+    </div>
+
+    <div class="voucher-setting-card no-print">
+      <div style="font-weight: 700; color: var(--accent-color); margin-bottom: 4px;">✍ 지출결의서 송금 계좌 및 청구인 설정 (서로 다를 수 있으므로 분리 입력)</div>
+      <div class="voucher-setting-grid">
+        <div>
+          <label style="font-size: 11px; color: var(--ink-secondary);">1. 은행명</label>
+          <input type="text" id="vBankName" class="form-control" style="height: 36px;" placeholder="예: 농협" oninput="onVoucherAccountInputChange()">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--ink-secondary);">2. 예금주 (수령인)</label>
+          <input type="text" id="vAccountHolder" class="form-control" style="height: 36px;" placeholder="예: 홍길동" oninput="onVoucherAccountInputChange()">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--ink-secondary);">3. 계좌번호</label>
+          <input type="text" id="vAccountNum" class="form-control" style="height: 36px;" placeholder="예: 123-456-789012" oninput="onVoucherAccountInputChange()">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--ink-secondary);">4. 청구인 성명 (작성자)</label>
+          <input type="text" id="vClaimantInput" class="form-control" style="height: 36px;" placeholder="예: 김회계" oninput="onVoucherAccountInputChange()">
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-scroll-container">
+      <div class="report-sheet-wrapper">
+        <div class="voucher-print-box">
+          <div>
+            <table class="v-top-box">
+              <tr>
+                <td rowspan="2" class="v-title-cell">지 출 결 의 서</td>
+                <td rowspan="2" class="v-approval-side">결<br>재</td>
+                <td class="v-approval-header">부 장</td>
+                <td class="v-approval-header">봉사회장</td>
+                <td class="v-approval-header">부목사</td>
+                <td class="v-approval-header">담임목사</td>
+              </tr>
+              <tr>
+                <td class="v-approval-stamp"></td>
+                <td class="v-approval-stamp"></td>
+                <td class="v-approval-stamp"></td>
+                <td class="v-approval-stamp"></td>
+              </tr>
+            </table>
+
+            <table class="v-meta-table">
+              <tr>
+                <th style="width: 12%;">시행기간</th>
+                <td colspan="3" style="text-align: center; white-space: nowrap !important; font-size: 12px;" id="vPeriodText"></td>
+                <th style="width: 12%;">시행부서</th>
+                <td colspan="3" style="text-align: center; font-weight: 700;" id="vDeptText"></td>
+              </tr>
+              <tr>
+                <th style="width: 12%;">지불방법</th>
+                <td style="width: 14%; text-align: center; font-weight: 700;">계좌 이체</td>
+                <th style="width: 10%;">은행명</th>
+                <td style="width: 16%; text-align: center; font-weight: 700;" id="vBankCell"></td>
+                <th style="width: 10%;">예금주</th>
+                <td style="width: 14%; text-align: center; font-weight: 700;" id="vHolderCell"></td>
+                <th style="width: 10%;">계좌번호</th>
+                <td style="width: 24%; text-align: center; font-weight: 700;" id="vAccNumCell"></td>
+              </tr>
+              <tr>
+                <th>지출금액</th>
+                <td colspan="7" style="font-weight: 700; font-size: 15px;" id="vTotalKoreanText"></td>
+              </tr>
+            </table>
+
+            <table class="v-main-table">
+              <thead>
+                <tr>
+                  <th style="width: 14%;">계정과목</th>
+                  <th style="width: 48%;">적 요</th>
+                  <th style="width: 24%;">금 액</th>
+                  <th style="width: 14%;">비 고</th>
+                </tr>
+              </thead>
+              <tbody id="vTableBody"></tbody>
+              <tfoot>
+                <tr>
+                  <td style="text-align: center; font-weight: 700;">합 계</td>
+                  <td colspan="2" style="text-align: right; font-weight: 800; font-size: 15.5px;" id="vTotalAmountText">0</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="v-footer-area">
+            <div class="v-claim-statement">위 금액을 청구하오니 지급하여 주시기 바랍니다.</div>
+            <div class="v-date-str" id="vDateStr"></div>
+
+            <div class="v-claimant-row">
+              <span>청구인</span>
+              <span style="letter-spacing: 6px;" id="vClaimantName"></span>
+              <span>(인)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. A4 결산보고서 양식 뷰 -->
+  <div id="viewReportPreview" style="display: none;">
+    <div class="report-view-actions no-print">
+      <div class="dept-selector-group">
+        <label for="deptSelect">출력 부서:</label>
+        <select id="deptSelect" class="dept-select" onchange="onDeptChange(this.value)">
+          <option value="유초등부">유초등부</option>
+          <option value="중고등부">중고등부</option>
+        </select>
+      </div>
+      <div class="report-btn-group">
+        <button type="button" class="btn-report-action excel" onclick="downloadExcelXml()"> 결산보고서 엑셀 저장</button>
+        <button type="button" class="btn-report-action print" onclick="printCurrentView('결산보고서')">️ 결산보고서 인쇄 / PDF 저장</button>
+      </div>
+    </div>
+
+    <div class="sheet-scroll-container">
+      <div class="report-sheet-wrapper">
+        <div class="print-page-box">
+          <div>
+            <div class="report-title-row">
+              <h1 class="report-title" id="printReportTitle">유초등부 결산보고서</h1>
+            </div>
+
+            <div class="report-approval-wrap">
+              <table class="approval-table">
+                <tr>
+                  <th rowspan="2" class="approval-side-title">결<br>재</th>
+                  <th class="approval-header-cell">부 장</th>
+                  <th class="approval-header-cell">봉사회장</th>
+                  <th class="approval-header-cell">부 목 사</th>
+                  <th class="approval-header-cell" style="border-right: 2px solid #000;">담임목사</th>
+                </tr>
+                <tr>
+                  <td class="approval-stamp-cell"></td>
+                  <td class="approval-stamp-cell"></td>
+                  <td class="approval-stamp-cell"></td>
+                  <td class="approval-stamp-cell" style="border-right: 2px solid #000;"></td>
+                </tr>
+              </table>
+            </div>
+
+            <table class="report-main-table" id="reportMainTable">
+              <thead>
+                <tr>
+                  <th colspan="2" class="col-border-right" style="width: 50%;">수 입 (예산)</th>
+                  <th colspan="2" style="width: 50%;">결 산</th>
+                </tr>
+                <tr style="font-size: 13px; background: #FFF;">
+                  <th style="width: 65%;">항 목</th>
+                  <th class="col-border-right" style="width: 35%;">금 액</th>
+                  <th style="width: 65%;">항 목</th>
+                  <th style="width: 35%;">금 액</th>
+                </tr>
+              </thead>
+              <tbody id="printReportTableBody"></tbody>
+              <tfoot>
+                <tr class="solid-row">
+                  <td class="text-center" style="font-weight: 700;">합 계</td>
+                  <td class="text-right report-num col-border-right" id="printIncomeTotal">0</td>
+                  <td class="text-center" style="font-weight: 700;">합 계</td>
+                  <td class="text-right report-num" id="printExpenseTotal">0</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div class="report-remain-box-wrap">
+              <table class="remain-table">
+                <tr>
+                  <th>잔 액</th>
+                  <td id="printRemainVal">0</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="report-footer">
+            <div class="report-statement">상기와 같이 예산안대로 수입된 금액을 집행하고 잔액을 교회에 반환 합니다.</div>
+            <div class="report-date-str" id="printReportDate"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 영수증 증빙 모아보기 양식 뷰 -->
+  <div id="viewReceiptsArea" style="display: none;">
+    <div class="report-view-actions no-print">
+      <div class="dept-selector-group">
+        <label for="receiptDeptSelect">출력 부서:</label>
+        <select id="receiptDeptSelect" class="dept-select" onchange="onReceiptDeptChange(this.value)">
+          <option value="유초등부">유초등부</option>
+          <option value="중고등부">중고등부</option>
+        </select>
+      </div>
+      <div class="report-btn-group">
+        <button type="button" class="btn-report-action print" style="background-color: #0F52BA;" onclick="printCurrentView('영수증증빙')">️ 영수증 증빙 PDF 저장 / 인쇄</button>
+        <button type="button" class="btn-report-action excel" onclick="downloadReceiptsExcelXml()"> 영수증 증빙 엑셀 저장 (.xls)</button>
+      </div>
+    </div>
+
+    <div class="sheet-scroll-container">
+      <div class="report-sheet-wrapper">
+        <div class="receipt-sheet-header">
+          <h2 class="receipt-sheet-title" id="receiptSheetTitle">결산 영수증 증빙서</h2>
+          <div style="font-size: 13px; color: var(--ink-secondary); margin-top: 4px;" id="receiptSheetPeriod"></div>
+        </div>
+
+        <div id="receiptGridContainer">
+          <!-- 동적 짝맞춤 그리드 렌더링 -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 영수증 확대 모달 -->
+<div id="receiptModal" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span style="font-weight: 600; font-size: 14px;" id="modalReceiptTitle">영수증 확인</span>
+      <button type="button" style="border:none; background:none; font-size: 16px; cursor:pointer;" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <img id="modalReceiptImg" src="" alt="영수증 원본">
+    </div>
+  </div>
+</div>
+
+<!-- 백업 기록 불러오기 모달 -->
+<div id="backupModal" class="modal-overlay" onclick="closeRestoreModal(event)">
+  <div class="modal-content backup-modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span style="font-weight: 700; font-size: 15px;"> 저장된 백업 시점 관리 및 복원</span>
+      <button type="button" style="border:none; background:none; font-size: 18px; cursor:pointer;" onclick="closeRestoreModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 12.5px; color: var(--ink-secondary); text-align: left; margin-bottom: 8px;">
+        상단의 [ 지금 시점 백업 저장]을 누르면 이 목록에 안전하게 누적 보관됩니다. 복원 버튼을 누르면 해당 시점으로 즉시 되돌릴 수 있습니다.
+      </p>
+      <div id="snapshotListContainer" class="snapshot-list"></div>
+
+      <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+        <span style="font-size: 11.5px; color: var(--ink-secondary);">모바일 ↔ PC 간 이동용 파일</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn-backup primary" onclick="exportBackupFile()"> 파일 다운로드 (.json)</button>
+          <label class="btn-backup" style="cursor: pointer;">
+            파일 불러오기
+            <input type="file" id="jsonFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)">
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast-msg"></div>
+
+<script>
+const now = new Date();
+const initYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+const defaultState = {
+  activeView: 'manage',
+  selectedDept: '유초등부',
+  selectedYearMonth: initYM,
+  openCategoryIds: [],
+  currentSubCategoryId: null,
+  editingCategoryId: null,
+  editingExpenseId: null,
+  voucher: {
+    bank: '',
+    holder: '',
+    account: '',
+    claimant: ''
+  },
+  categories: [],
+  expenses: []
+};
+
+let state = JSON.parse(JSON.stringify(defaultState));
+let backupSnapshots = [];
+
+const STORAGE_KEY = 'church_budget_system_data_v1';
+const SNAPSHOTS_KEY = 'church_budget_snapshots_v1';
+
+function migrateExpenses(expenses) {
+  if (!Array.isArray(expenses)) return [];
+  return expenses.map(exp => {
+    let imgs = [];
+    if (Array.isArray(exp.receiptImgs)) {
+      imgs = exp.receiptImgs;
+    } else if (exp.receiptImg && typeof exp.receiptImg === 'string') {
+      imgs = [exp.receiptImg];
+    }
+    return {
+      ...exp,
+      receiptImgs: imgs,
+      receiptImg: imgs.length > 0 ? imgs[0] : ""
+    };
+  });
+}
+
+function sanitizeState(parsed) {
+  if (!parsed) return defaultState;
+  const s = { ...defaultState, ...parsed };
+  if (!Array.isArray(s.categories)) s.categories = [];
+  s.expenses = migrateExpenses(s.expenses);
+  if (!s.voucher) s.voucher = { bank: '', holder: '', account: '', claimant: '' };
+  return s;
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(SNAPSHOTS_KEY, JSON.stringify(backupSnapshots));
+  } catch (e) {}
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.categories)) {
+        state = sanitizeState(parsed);
+      }
+    }
+    const snapRaw = localStorage.getItem(SNAPSHOTS_KEY);
+    if (snapRaw) {
+      const parsedSnaps = JSON.parse(snapRaw);
+      if (Array.isArray(parsedSnaps)) {
+        backupSnapshots = parsedSnaps.map(snap => ({
+          ...snap,
+          data: sanitizeState(snap.data)
+        }));
+      }
+    }
+  } catch (e) {}
+
+  if (!state.selectedYearMonth) {
+    state.selectedYearMonth = initYM;
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.innerText = msg;
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 2600);
+}
+
+function triggerAutoSave() {
+  saveToLocalStorage();
+  const indicator = document.getElementById('autoSaveIndicator');
+  const text = document.getElementById('autoSaveStatusText');
+  indicator.style.backgroundColor = 'var(--warning-color)';
+  text.innerText = '저장 중...';
+
+  setTimeout(() => {
+    indicator.style.backgroundColor = 'var(--success-color)';
+    const t = new Date();
+    const timeStr = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+    text.innerText = `실시간 자동 저장됨 (${timeStr})`;
+  }, 200);
+}
+
+function renderShrinkFitText(text, normalLimit = 15) {
+  if (!text) return '';
+  const str = String(text);
+  const len = str.length;
+  let fontSize = '13.5px';
+  if (len > 35) fontSize = '9px';
+  else if (len > 24) fontSize = '10px';
+  else if (len > normalLimit) fontSize = '11.5px';
+
+  return `<div style="width:100%; height:100%; display:flex; align-items:center; overflow:hidden;">
+    <span style="display:block; font-size:${fontSize}; line-height:1.2; word-break:break-all; width:100%;">${str}</span>
+  </div>`;
+}
+
+function renderShrinkFitCenter(text, normalLimit = 10) {
+  if (!text) return '';
+  const str = String(text);
+  const len = str.length;
+  let fontSize = '13px';
+  if (len > 22) fontSize = '9.5px';
+  else if (len > 14) fontSize = '11px';
+  else if (len > normalLimit) fontSize = '12px';
+
+  return `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; text-align:center;">
+    <span style="display:block; font-size:${fontSize}; line-height:1.2; word-break:break-all; width:100%;">${str}</span>
+  </div>`;
+}
+
+window.onVoucherAccountInputChange = function() {
+  const bank = document.getElementById('vBankName').value || '';
+  const holder = document.getElementById('vAccountHolder').value || '';
+  const accNum = document.getElementById('vAccountNum').value || '';
+  const claimant = document.getElementById('vClaimantInput').value || '';
+
+  if (!state.voucher) state.voucher = {};
+  state.voucher.bank = bank;
+  state.voucher.holder = holder;
+  state.voucher.account = accNum;
+  state.voucher.claimant = claimant;
+
+  const bankEl = document.getElementById('vBankCell');
+  const holderEl = document.getElementById('vHolderCell');
+  const accNumEl = document.getElementById('vAccNumCell');
+  const claimantEl = document.getElementById('vClaimantName');
+
+  if (bankEl) bankEl.innerHTML = renderShrinkFitCenter(bank, 7);
+  if (holderEl) holderEl.innerHTML = renderShrinkFitCenter(holder, 5);
+  if (accNumEl) accNumEl.innerHTML = renderShrinkFitCenter(accNum, 14);
+
+  const displayClaimant = claimant || holder || '';
+  if (claimantEl) claimantEl.innerText = displayClaimant ? displayClaimant.split('').join(' ') : '';
+
+  triggerAutoSave();
+};
+
+window.onDeptChange = function(newDept) {
+  state.selectedDept = newDept;
+  document.getElementById('voucherDeptSelect').value = newDept;
+  document.getElementById('receiptDeptSelect').value = newDept;
+  renderReportPreviewTable();
+  renderVoucherPreview();
+  renderReceiptsView();
+  triggerAutoSave();
+  showToast(`부서가 [${newDept}]로 변경되었습니다.`);
+};
+
+window.onVoucherDeptChange = function(newDept) {
+  state.selectedDept = newDept;
+  document.getElementById('deptSelect').value = newDept;
+  document.getElementById('receiptDeptSelect').value = newDept;
+  renderReportPreviewTable();
+  renderVoucherPreview();
+  renderReceiptsView();
+  triggerAutoSave();
+  showToast(`부서가 [${newDept}]로 변경되었습니다.`);
+};
+
+window.onReceiptDeptChange = function(newDept) {
+  state.selectedDept = newDept;
+  document.getElementById('deptSelect').value = newDept;
+  document.getElementById('voucherDeptSelect').value = newDept;
+  renderReportPreviewTable();
+  renderVoucherPreview();
+  renderReceiptsView();
+  triggerAutoSave();
+  showToast(`부서가 [${newDept}]로 변경되었습니다.`);
+};
+
+async function downloadBlob(content, defaultFileName, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+
+  if (window.showSaveFilePicker) {
+    try {
+      let ext = '.bin';
+      if (defaultFileName.endsWith('.xls')) ext = '.xls';
+      else if (defaultFileName.endsWith('.json')) ext = '.json';
+
+      const handle = await window.showSaveFilePicker({
+        suggestedName: defaultFileName,
+        types: [{
+          description: ext === '.xls' ? 'Excel 파일 (.xls)' : 'JSON 백업 파일 (.json)',
+          accept: { [mimeType.split(';')[0]]: [ext] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showToast(` [${handle.name}] 파일 저장이 완료되었습니다.`);
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        return;
+      }
+    }
+  }
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = defaultFileName;
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(() => {
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  }, 250);
+}
+
+function getFormattedStamp(d = new Date()) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+}
+
+function getFormattedDateOnly(d = new Date()) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}`;
+}
+
+window.createManualBackup = function() {
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+
+  const snapshot = {
+    id: Date.now(),
+    title: `광양교회 회계 백업 [${state.selectedDept}] ${formatYearMonthText(state.selectedYearMonth)}`,
+    createdAt: dateStr,
+    data: JSON.parse(JSON.stringify(state))
+  };
+
+  backupSnapshots.unshift(snapshot);
+  saveToLocalStorage();
+  updateBackupCountBadge();
+  showToast(` [${dateStr}] 백업 시점이 저장되었습니다!`);
+};
+
+function updateBackupCountBadge() {
+  document.getElementById('backupCountBadge').innerText = backupSnapshots.length;
+}
+
+window.openRestoreModal = function() {
+  renderSnapshotList();
+  document.getElementById('backupModal').classList.add('active');
+};
+
+window.closeRestoreModal = function(e) {
+  if (e && e.target !== e.currentTarget && e.target.tagName !== 'BUTTON') return;
+  document.getElementById('backupModal').classList.remove('active');
+};
+
+function renderSnapshotList() {
+  const container = document.getElementById('snapshotListContainer');
+  container.innerHTML = '';
+
+  if (backupSnapshots.length === 0) {
+    container.innerHTML = '<div style="font-size: 13px; color: var(--ink-secondary); padding: 16px 0; text-align: center;">저장된 백업 기록이 없습니다.</div>';
+    return;
+  }
+
+  backupSnapshots.forEach(snap => {
+    const item = document.createElement('div');
+    item.className = 'snapshot-item';
+    const catCount = snap.data.categories ? snap.data.categories.length : 0;
+    const expCount = snap.data.expenses ? snap.data.expenses.length : 0;
+
+    item.innerHTML = `
+      <div class="snapshot-info">
+        <span class="snapshot-date"> ${snap.createdAt}</span>
+        <span class="snapshot-meta">${snap.title} · 항목 ${catCount}개 · 지출 ${expCount}건</span>
+      </div>
+      <div class="snapshot-actions">
+        <button type="button" class="btn-backup primary" onclick="restoreFromSnapshot(${snap.id})">복원</button>
+        <button type="button" class="btn-action-icon del" onclick="deleteSnapshot(${snap.id})" title="백업 삭제">✕</button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+window.restoreFromSnapshot = function(snapshotId) {
+  const target = backupSnapshots.find(s => s.id === snapshotId);
+  if (!target) return;
+
+  state = sanitizeState(JSON.parse(JSON.stringify(target.data)));
+  document.getElementById('selectedMonthInput').value = state.selectedYearMonth;
+  if (state.selectedDept) {
+    document.getElementById('deptSelect').value = state.selectedDept;
+    document.getElementById('voucherDeptSelect').value = state.selectedDept;
+    document.getElementById('receiptDeptSelect').value = state.selectedDept;
+  }
+
+  closeRestoreModal();
+  renderCategoryListView();
+  if (state.currentSubCategoryId !== null) {
+    renderSubExpenseList();
+  }
+  if (state.activeView === 'preview') {
+    renderReportPreviewTable();
+  }
+  if (state.activeView === 'voucher') {
+    renderVoucherPreview();
+  }
+  if (state.activeView === 'receipts') {
+    renderReceiptsView();
+  }
+
+  triggerAutoSave();
+  showToast(` [${target.createdAt}] 데이터로 복원되었습니다.`);
+};
+
+window.deleteSnapshot = function(snapshotId) {
+  backupSnapshots = backupSnapshots.filter(s => s.id !== snapshotId);
+  saveToLocalStorage();
+  updateBackupCountBadge();
+  renderSnapshotList();
+  showToast('백업 기록이 삭제되었습니다.');
+};
+
+window.exportBackupFile = function() {
+  const nowD = new Date();
+  const timeStamp = getFormattedStamp(nowD);
+  const deptName = state.selectedDept || '유초등부';
+  const ymTag = (state.selectedYearMonth || initYM).replace('-', '년_') + '월';
+
+  const exportData = {
+    system: "광양교회 교회학교 회계관리",
+    version: "v2.0",
+    exportDate: nowD.toISOString(),
+    currentState: state,
+    snapshots: backupSnapshots
+  };
+
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const fileName = `광양교회_회계_백업_${deptName}_${ymTag}_${timeStamp}.json`;
+
+  downloadBlob(jsonStr, fileName, 'application/json');
+};
+
+window.importBackupFile = function(inputEl) {
+  const file = inputEl.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const imported = JSON.parse(evt.target.result);
+      if (imported.currentState && Array.isArray(imported.currentState.categories)) {
+        state = sanitizeState(imported.currentState);
+        if (Array.isArray(imported.snapshots)) {
+          backupSnapshots = imported.snapshots.map(s => ({
+            ...s,
+            data: sanitizeState(s.data)
+          }));
+        }
+        if (state.selectedDept) {
+          document.getElementById('deptSelect').value = state.selectedDept;
+          document.getElementById('voucherDeptSelect').value = state.selectedDept;
+          document.getElementById('receiptDeptSelect').value = state.selectedDept;
+        }
+        document.getElementById('selectedMonthInput').value = state.selectedYearMonth;
+
+        saveToLocalStorage();
+        updateBackupCountBadge();
+        renderSnapshotList();
+        renderCategoryListView();
+        renderVoucherPreview();
+        renderReportPreviewTable();
+        renderReceiptsView();
+        closeRestoreModal();
+        showToast(' 백업 파일을 성공적으로 불러왔습니다 (이전 버전 호환 완료).');
+      } else {
+        alert('올바르지 않은 백업 파일 형식입니다.');
+      }
+    } catch (e) {
+      alert('파일을 읽는 도중 오류가 발생했습니다: ' + e.message);
+    }
+  };
+  reader.readAsText(file);
+  inputEl.value = '';
+};
+
+function formatWon(num) {
+  return (num || 0).toLocaleString('ko-KR') + '원';
+}
+function formatNum(num) {
+  return (num || 0).toLocaleString('ko-KR');
+}
+function formatYearMonthText(ymStr) {
+  const [y, m] = ymStr.split('-');
+  return `${y}년 ${parseInt(m, 10)}월`;
+}
+
+function numberToKorean(number) {
+  if (number === 0) return '일금영원정';
+  const units = ['', '만', '억', '조'];
+  const smallUnits = ['', '십', '백', '천'];
+  const numDigits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+
+  let numStr = String(number);
+  let result = '';
+  let unitIndex = 0;
+
+  while (numStr.length > 0) {
+    const chunk = numStr.slice(-4);
+    numStr = numStr.slice(0, -4);
+    let chunkResult = '';
+
+    for (let i = 0; i < chunk.length; i++) {
+      const digit = parseInt(chunk[chunk.length - 1 - i], 10);
+      if (digit > 0) {
+        chunkResult = numDigits[digit] + smallUnits[i] + chunkResult;
+      }
+    }
+
+    if (chunkResult.length > 0) {
+      result = chunkResult + units[unitIndex] + result;
+    }
+    unitIndex++;
+  }
+
+  return '일금' + result + '원정';
+}
+
+window.switchView = function(viewName) {
+  state.activeView = viewName;
+  const manageArea = document.getElementById('viewManageArea');
+  const previewArea = document.getElementById('viewReportPreview');
+  const voucherArea = document.getElementById('viewVoucherPreview');
+  const detailInputArea = document.getElementById('viewDetailInputArea');
+  const receiptsArea = document.getElementById('viewReceiptsArea');
+
+  const tabManage = document.getElementById('tabBtnManage');
+  const tabPreview = document.getElementById('tabBtnPreview');
+  const tabVoucher = document.getElementById('tabBtnVoucher');
+  const tabReceipts = document.getElementById('tabBtnReceipts');
+
+  manageArea.style.display = 'none';
+  detailInputArea.style.display = 'none';
+  previewArea.style.display = 'none';
+  voucherArea.style.display = 'none';
+  receiptsArea.style.display = 'none';
+
+  tabManage.classList.remove('active');
+  tabPreview.classList.remove('active');
+  tabVoucher.classList.remove('active');
+  tabReceipts.classList.remove('active');
+
+  if (viewName === 'manage') {
+    manageArea.style.display = 'block';
+    tabManage.classList.add('active');
+    renderCategoryListView();
+  } else if (viewName === 'voucher') {
+    voucherArea.style.display = 'block';
+    tabVoucher.classList.add('active');
+    renderVoucherPreview();
+  } else if (viewName === 'preview') {
+    previewArea.style.display = 'block';
+    tabPreview.classList.add('active');
+    renderReportPreviewTable();
+  } else if (viewName === 'receipts') {
+    receiptsArea.style.display = 'block';
+    tabReceipts.classList.add('active');
+    renderReceiptsView();
+  }
+};
+
+window.shiftMonth = function(delta) {
+  const [y, m] = state.selectedYearMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  const nextY = d.getFullYear();
+  const nextM = String(d.getMonth() + 1).padStart(2, '0');
+  setYearMonth(`${nextY}-${nextM}`);
+};
+
+window.onMonthInputChange = function(val) {
+  if (val) setYearMonth(val);
+};
+
+function setYearMonth(ym) {
+  state.selectedYearMonth = ym;
+  document.getElementById('selectedMonthInput').value = ym;
+  cancelCategoryEdit();
+
+  renderCategoryListView();
+
+  if (state.currentSubCategoryId !== null) {
+    document.getElementById('subExpDate').value = `${ym}-01`;
+    renderSubExpenseList();
+  }
+
+  if (state.activeView === 'preview') {
+    renderReportPreviewTable();
+  }
+  if (state.activeView === 'voucher') {
+    renderVoucherPreview();
+  }
+  if (state.activeView === 'receipts') {
+    renderReceiptsView();
+  }
+
+  triggerAutoSave();
+}
+
+window.toggleAccordion = function(catId, event) {
+  if (event && (event.target.closest('.category-actions') || event.target.closest('.btn-go-detail'))) return;
+  const idx = state.openCategoryIds.indexOf(catId);
+  if (idx > -1) {
+    state.openCategoryIds.splice(idx, 1);
+  } else {
+    state.openCategoryIds.push(catId);
+  }
+  renderCategoryListView();
+};
+
+function getExpenseImages(item) {
+  if (Array.isArray(item.receiptImgs) && item.receiptImgs.length > 0) {
+    return item.receiptImgs;
+  }
+  if (item.receiptImg) {
+    return [item.receiptImg];
+  }
+  return [];
+}
+
+function renderCategoryListView() {
+  const currentYM = state.selectedYearMonth;
+  const ymText = formatYearMonthText(currentYM);
+
+  document.getElementById('bannerMonthTitle').innerText = ymText;
+
+  const monthCategories = state.categories.filter(c => c.yearMonth === currentYM);
+
+  let monthTotalBudget = 0;
+  let monthTotalSupport = 0;
+  let monthTotalSpent = 0;
+  let monthDoneTransfers = 0;
+  let monthPendingTransfers = 0;
+
+  monthCategories.forEach(cat => {
+    monthTotalBudget += cat.budget;
+    monthTotalSupport += (cat.support || 0);
+    const catExpenses = state.expenses.filter(e => e.categoryId === cat.id && e.date.startsWith(currentYM));
+    catExpenses.forEach(exp => {
+      monthTotalSpent += exp.amount;
+      if (exp.status === 'pending') {
+        monthPendingTransfers += exp.amount;
+      } else {
+        monthDoneTransfers += exp.amount;
+      }
+    });
+  });
+
+  const monthTotalSource = monthTotalBudget + monthTotalSupport;
+  const monthRemain = monthTotalSource - monthTotalSpent;
+
+  document.getElementById('bannerTotalIncome').innerHTML = `${formatWon(monthTotalSource)} <span style="font-size:10px; opacity:0.85; font-weight:normal;">(예산 ${formatNum(monthTotalBudget)}${monthTotalSupport > 0 ? ` + 찬조 ${formatNum(monthTotalSupport)}` : ''})</span>`;
+  document.getElementById('bannerTotalExpense').innerText = formatWon(monthTotalSpent);
+  document.getElementById('bannerTotalSpent').innerText = formatWon(monthTotalSpent);
+  document.getElementById('bannerDoneTransfers').innerText = formatWon(monthDoneTransfers);
+  document.getElementById('bannerPendingTransfers').innerText = formatWon(monthPendingTransfers);
+  document.getElementById('bannerTotalRemain').innerText = monthRemain < 0
+    ? `초과 (+${formatWon(Math.abs(monthRemain))})`
+    : `잔액 ${formatWon(monthRemain)}`;
+
+  const container = document.getElementById('categoryCardsContainer');
+  const summaryEl = document.getElementById('catTotalSummary');
+  container.innerHTML = '';
+  summaryEl.innerText = `총 ${monthCategories.length}개 항목`;
+
+  if (monthCategories.length === 0) {
+    container.innerHTML = `<div class="empty-state">${ymText}에 등록된 예산 항목이 없습니다.<br>위에서 [+ 항목 등록하기] 버튼으로 새 항목을 추가해 보세요.</div>`;
+    return;
+  }
+
+  monthCategories.forEach(cat => {
+    const catExpenses = state.expenses.filter(e => e.categoryId === cat.id && e.date.startsWith(currentYM));
+    const spent = catExpenses.reduce((sum, item) => sum + item.amount, 0);
+    const pendingTransfers = catExpenses.filter(e => e.status === 'pending').reduce((sum, item) => sum + item.amount, 0);
+    const doneTransfers = spent - pendingTransfers;
+    const isOpen = state.openCategoryIds.includes(cat.id);
+
+    const catSupport = cat.support || 0;
+    const catTotalSource = cat.budget + catSupport;
+    const catRemain = catTotalSource - spent;
+
+    const baseBudget = catTotalSource > 0 ? catTotalSource : spent;
+    let donePercent = baseBudget > 0 ? (doneTransfers / baseBudget) * 100 : 0;
+    let pendingPercent = baseBudget > 0 ? (pendingTransfers / baseBudget) * 100 : 0;
+
+    if (donePercent + pendingPercent > 100) {
+      const scale = 100 / (donePercent + pendingPercent);
+      donePercent *= scale;
+      pendingPercent *= scale;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'category-card';
+
+    let expenseItemsHtml = '';
+    if (catExpenses.length === 0) {
+      expenseItemsHtml = `<div class="empty-state">${ymText}에 등록된 세부 지출이 없습니다. 우측 [세부내역 기입/관리] 버튼을 눌러 추가하세요.</div>`;
+    } else {
+      catExpenses.forEach(item => {
+        let statusBadge = '';
+        if (item.status === 'done') {
+          statusBadge = `<span class="status-badge-btn status-done">송금완료 ✓</span>`;
+        } else if (item.status === 'pending') {
+          statusBadge = `<span class="status-badge-btn status-pending">미송금</span>`;
+        } else {
+          statusBadge = `<span class="status-badge-btn status-self">본인지출</span>`;
+        }
+
+        const isMe = item.buyer === '본인';
+        const imgs = getExpenseImages(item);
+        let receiptHtml = '';
+        if (imgs.length > 0) {
+          const firstImg = imgs[0];
+          receiptHtml = `
+            <div class="receipt-thumbs-group">
+              <button type="button" class="receipt-thumb-btn" onclick="openExpenseGallery(${item.id})" title="영수증 확인 (총 ${imgs.length}장)">
+                <img src="${firstImg}" alt="영수증">
+                ${imgs.length > 1 ? `<span class="receipt-count-badge">+${imgs.length}</span>` : ''}
+              </button>
+            </div>
+          `;
+        } else {
+          receiptHtml = `<div class="receipt-thumb-btn" style="cursor: default;"><span>영수증<br>없음</span></div>`;
+        }
+
+        expenseItemsHtml += `
+          <div class="expense-item">
+            <div class="expense-item-main">
+              <div class="expense-desc-wrap">
+                <div class="expense-desc">${item.desc}</div>
+                <div class="expense-amount">${formatWon(item.amount)}</div>
+              </div>
+              ${receiptHtml}
+            </div>
+            <div class="expense-meta-row">
+              <div>
+                <span class="buyer-badge ${isMe ? 'me' : ''}">결제: ${item.buyer}</span>
+                <span style="margin-left: 6px;">${item.date}</span>
+              </div>
+              <div>${statusBadge}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    card.innerHTML = `
+      <div class="category-card-header" onclick="toggleAccordion(${cat.id}, event)">
+        <div class="category-top">
+          <div class="category-name-wrap">
+            <span class="toggle-badge ${isOpen ? 'open' : ''}" title="펼치기/접기">▶</span>
+            <span class="category-name">${cat.name}</span>
+            <span style="font-size: 11.5px; color: var(--ink-secondary); font-weight: normal; flex-shrink: 0;">(${catExpenses.length}건)</span>
+          </div>
+          <div class="category-actions">
+            <button type="button" class="btn-go-detail" onclick="openDetailView(${cat.id})">세부내역 기입/관리 ✍</button>
+            <button type="button" class="btn-action-icon" onclick="startEditCategory(${cat.id})">수정</button>
+            <button type="button" class="btn-action-icon del" onclick="deleteCategory(${cat.id})">삭제</button>
+          </div>
+        </div>
+
+        <div class="category-amounts">
+          <span>배정 예산: <strong>${formatWon(cat.budget)}</strong>${catSupport > 0 ? ` <span style="color:var(--support-color);">(+찬조: ${formatWon(catSupport)})</span>` : ''}</span>
+          <span>지출 합계: <strong>${formatWon(spent)}</strong></span>
+          <span style="color: ${catRemain < 0 ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight: 700;">
+            잔액: ${formatWon(catRemain)}
+          </span>
+        </div>
+
+        <div class="stacked-progress-container">
+          <div class="bar-segment-done" style="width: ${donePercent}%;"></div>
+          <div class="bar-segment-pending" style="width: ${pendingPercent}%;"></div>
+        </div>
+
+        <div class="bar-legend-row">
+          <div class="legend-group">
+            <div class="legend-item">
+              <span class="legend-dot" style="background-color: var(--bar-done);"></span>
+              <span>완료: <strong>${formatWon(doneTransfers)}</strong></span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background-color: var(--bar-pending);"></span>
+              <span>대기: <strong style="color: var(--warning-color);">${formatWon(pendingTransfers)}</strong></span>
+            </div>
+          </div>
+          <span style="color: ${catRemain < 0 ? 'var(--danger-color)' : 'var(--accent-color)'}; font-weight: 600;">
+            ${catTotalSource > 0 ? Math.round((spent / catTotalSource) * 100) : 0}% 집행
+          </span>
+        </div>
+      </div>
+
+      <div class="category-card-body ${isOpen ? 'open' : ''}">
+        <div class="accordion-header-sub">
+          <h3 style="font-size: 13.5px; font-weight: 700; color: var(--ink-primary);">
+            [${cat.name}] ${ymText} 세부 지출 조회
+          </h3>
+          <button type="button" class="btn-go-detail" onclick="openDetailView(${cat.id})">+ 세부 지출 추가/수정하기</button>
+        </div>
+        ${expenseItemsHtml}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+window.openDetailView = function(catId) {
+  state.currentSubCategoryId = catId;
+  const cat = state.categories.find(c => c.id === catId);
+  if (!cat) return;
+
+  document.getElementById('viewManageArea').style.display = 'none';
+  document.getElementById('viewDetailInputArea').style.display = 'block';
+  document.getElementById('detailViewNavTitle').innerText = `[${cat.name}] ${formatYearMonthText(state.selectedYearMonth)} 세부 내역 기입`;
+  document.getElementById('subExpDate').value = `${state.selectedYearMonth}-01`;
+
+  cancelSubExpenseEdit();
+  renderSubExpenseList();
+};
+
+window.backToMainManage = function() {
+  state.currentSubCategoryId = null;
+  document.getElementById('viewDetailInputArea').style.display = 'none';
+  document.getElementById('viewManageArea').style.display = 'block';
+  renderCategoryListView();
+};
+
+function renderSubExpenseList() {
+  const catId = state.currentSubCategoryId;
+  const currentYM = state.selectedYearMonth;
+  const catExpenses = state.expenses.filter(e => e.categoryId === catId && e.date.startsWith(currentYM));
+  const container = document.getElementById('subExpenseListContainer');
+  const countEl = document.getElementById('subDetailExpenseCount');
+  container.innerHTML = '';
+  countEl.innerText = `${formatYearMonthText(currentYM)}: ${catExpenses.length}건`;
+
+  if (catExpenses.length === 0) {
+    container.innerHTML = `<div class="empty-state">${formatYearMonthText(currentYM)}에 등록된 세부 지출 내역이 없습니다.<br>위 폼에서 내역을 작성해 주세요.</div>`;
+    return;
+  }
+
+  catExpenses.forEach(item => {
+    let statusBtn = '';
+    if (item.status === 'done') {
+      statusBtn = `<button type="button" class="status-badge-btn status-done" onclick="toggleSubExpenseStatus(${item.id})">송금완료 ✓</button>`;
+    } else if (item.status === 'pending') {
+      statusBtn = `<button type="button" class="status-badge-btn status-pending" onclick="toggleSubExpenseStatus(${item.id})">미송금 (클릭 완료)</button>`;
+    } else {
+      statusBtn = `<span class="status-badge-btn status-self">본인지출</span>`;
+    }
+
+    const isMe = item.buyer === '본인';
+    const imgs = getExpenseImages(item);
+    let receiptHtml = '';
+    if (imgs.length > 0) {
+      receiptHtml = `
+        <div class="receipt-thumbs-group">
+          <button type="button" class="receipt-thumb-btn" onclick="openExpenseGallery(${item.id})" title="영수증 확인 (총 ${imgs.length}장)">
+            <img src="${imgs[0]}" alt="영수증">
+            ${imgs.length > 1 ? `<span class="receipt-count-badge">+${imgs.length}</span>` : ''}
+          </button>
+        </div>
+      `;
+    } else {
+      receiptHtml = `<div class="receipt-thumb-btn" style="cursor: default;"><span>영수증<br>없음</span></div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'expense-item';
+    card.innerHTML = `
+      <div class="expense-item-main">
+        <div class="expense-desc-wrap">
+          <div class="expense-desc">${item.desc}</div>
+          <div class="expense-amount">${formatWon(item.amount)}</div>
+        </div>
+        ${receiptHtml}
+      </div>
+      <div class="expense-meta-row">
+        <div>
+          <span class="buyer-badge ${isMe ? 'me' : ''}">결제: ${item.buyer}</span>
+          <span style="margin-left: 6px;">${item.date}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          ${statusBtn}
+          <button type="button" class="btn-action-icon" onclick="startEditSubExpense(${item.id})">수정</button>
+          <button type="button" class="btn-action-icon del" onclick="deleteSubExpenseItem(${item.id})">삭제</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+document.getElementById('subExpBuyer').addEventListener('input', function(e) {
+  const statusEl = document.getElementById('subExpStatus');
+  if (e.target.value.trim() === '본인') {
+    statusEl.value = 'self';
+  } else if (statusEl.value === 'self') {
+    statusEl.value = 'pending';
+  }
+});
+
+let currentSubReceiptDataUrls = [];
+
+window.handleSubReceiptMultiSelect = function(inputEl) {
+  const files = Array.from(inputEl.files || []);
+  if (files.length === 0) return;
+
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      currentSubReceiptDataUrls.push(evt.target.result);
+      loaded++;
+      if (loaded === files.length) {
+        renderSubMultiPreview();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  inputEl.value = '';
+};
+
+function renderSubMultiPreview() {
+  const strip = document.getElementById('subFormMultiPreviewStrip');
+  const clearBtn = document.getElementById('subBtnClearAllReceipts');
+  strip.innerHTML = '';
+
+  if (currentSubReceiptDataUrls.length === 0) {
+    clearBtn.style.display = 'none';
+    return;
+  }
+
+  clearBtn.style.display = 'inline-block';
+  clearBtn.innerText = `영수증 전체 삭제 (${currentSubReceiptDataUrls.length}장)`;
+
+  currentSubReceiptDataUrls.forEach((url, idx) => {
+    const box = document.createElement('div');
+    box.className = 'multi-preview-thumb-box';
+    box.innerHTML = `
+      <img src="${url}" alt="영수증_${idx+1}" onclick="openModal('${url}', '영수증 ${idx+1}')">
+      <button type="button" class="btn-remove-single" onclick="removeSingleReceipt(${idx})" title="삭제">✕</button>
+    `;
+    strip.appendChild(box);
+  });
+}
+
+window.removeSingleReceipt = function(idx) {
+  currentSubReceiptDataUrls.splice(idx, 1);
+  renderSubMultiPreview();
+};
+
+window.clearAllSubReceiptImages = function() {
+  currentSubReceiptDataUrls = [];
+  const inputEl = document.getElementById('subExpReceipt');
+  if (inputEl) inputEl.value = '';
+  renderSubMultiPreview();
+};
+
+window.handleSaveSubExpense = function() {
+  const descInput = document.getElementById('subExpDesc');
+  const amountInput = document.getElementById('subExpAmount');
+  const dateInput = document.getElementById('subExpDate');
+  const buyerInput = document.getElementById('subExpBuyer');
+  const statusInput = document.getElementById('subExpStatus');
+  const errorMsg = document.getElementById('subExpErrorMsg');
+
+  const desc = descInput.value.trim();
+  const amount = parseInt(amountInput.value, 10);
+  const date = dateInput.value;
+  const buyer = buyerInput.value.trim();
+  const status = statusInput.value;
+
+  if (!desc || isNaN(amount) || !date || !buyer) {
+    errorMsg.style.display = 'block';
+    return;
+  }
+  errorMsg.style.display = 'none';
+
+  const finalImgs = [...currentSubReceiptDataUrls];
+  const firstImg = finalImgs.length > 0 ? finalImgs[0] : "";
+
+  if (state.editingExpenseId) {
+    state.expenses = state.expenses.map(exp => {
+      if (exp.id === state.editingExpenseId) {
+        return {
+          ...exp,
+          desc,
+          amount,
+          date,
+          buyer,
+          status,
+          receiptImgs: finalImgs,
+          receiptImg: firstImg
+        };
+      }
+      return exp;
+    });
+  } else {
+    const newExpense = {
+      id: Date.now(),
+      categoryId: state.currentSubCategoryId,
+      desc,
+      amount,
+      date,
+      buyer,
+      status,
+      receiptImgs: finalImgs,
+      receiptImg: firstImg
+    };
+    state.expenses.unshift(newExpense);
+  }
+
+  cancelSubExpenseEdit();
+  renderSubExpenseList();
+  triggerAutoSave();
+};
+
+window.startEditSubExpense = function(expId) {
+  const exp = state.expenses.find(e => e.id === expId);
+  if (!exp) return;
+
+  state.editingExpenseId = expId;
+  document.getElementById('subExpDesc').value = exp.desc;
+  document.getElementById('subExpAmount').value = exp.amount;
+  document.getElementById('subExpDate').value = exp.date;
+  document.getElementById('subExpBuyer').value = exp.buyer;
+  document.getElementById('subExpStatus').value = exp.status;
+
+  currentSubReceiptDataUrls = getExpenseImages(exp);
+  renderSubMultiPreview();
+
+  document.getElementById('expFormTitle').innerText = '세부 지출 내역 수정';
+  document.getElementById('btnSubmitSubExp').innerText = '수정 완료';
+  document.getElementById('btnCancelSubExpEdit').style.display = 'inline-block';
+  document.getElementById('expenseFormCard').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelSubExpenseEdit = function() {
+  state.editingExpenseId = null;
+  document.getElementById('subExpDesc').value = '';
+  document.getElementById('subExpAmount').value = '';
+  document.getElementById('subExpBuyer').value = '';
+  document.getElementById('subExpStatus').value = 'pending';
+  document.getElementById('subExpErrorMsg').style.display = 'none';
+  document.getElementById('expFormTitle').innerText = '+ 세부 지출 내역 등록';
+  document.getElementById('btnSubmitSubExp').innerText = '내역 저장';
+  document.getElementById('btnCancelSubExpEdit').style.display = 'none';
+  clearAllSubReceiptImages();
+};
+
+window.toggleSubExpenseStatus = function(id) {
+  state.expenses = state.expenses.map(exp => {
+    if (exp.id === id) {
+      if (exp.status === 'pending') return { ...exp, status: 'done' };
+      if (exp.status === 'done') return { ...exp, status: 'pending' };
+    }
+    return exp;
+  });
+  renderSubExpenseList();
+  triggerAutoSave();
+};
+
+window.deleteSubExpenseItem = function(id) {
+  state.expenses = state.expenses.filter(exp => exp.id !== id);
+  renderSubExpenseList();
+  triggerAutoSave();
+};
+
+window.handleSaveCategory = function() {
+  const nameInput = document.getElementById('catName');
+  const budgetInput = document.getElementById('catBudget');
+  const supportInput = document.getElementById('catSupport');
+  const errorMsg = document.getElementById('catErrorMsg');
+
+  const name = nameInput.value.trim();
+  const budget = parseInt(budgetInput.value || '0', 10);
+  const support = parseInt(supportInput.value || '0', 10);
+
+  if (!name || isNaN(budget) || budget < 0 || isNaN(support) || support < 0) {
+    errorMsg.style.display = 'block';
+    return;
+  }
+  errorMsg.style.display = 'none';
+
+  if (state.editingCategoryId) {
+    state.categories = state.categories.map(cat => {
+      if (cat.id === state.editingCategoryId) {
+        return { ...cat, name, budget, support };
+      }
+      return cat;
+    });
+    cancelCategoryEdit();
+  } else {
+    const newCategory = {
+      id: Date.now(),
+      yearMonth: state.selectedYearMonth,
+      name,
+      budget,
+      support
+    };
+    state.categories.push(newCategory);
+  }
+
+  renderCategoryListView();
+  nameInput.value = '';
+  budgetInput.value = '';
+  supportInput.value = '';
+  triggerAutoSave();
+};
+
+window.startEditCategory = function(id) {
+  const cat = state.categories.find(c => c.id === id);
+  if (!cat) return;
+
+  state.editingCategoryId = id;
+  document.getElementById('catName').value = cat.name;
+  document.getElementById('catBudget').value = cat.budget;
+  document.getElementById('catSupport').value = cat.support || 0;
+  document.getElementById('catFormTitle').innerText = '예산 항목 수정';
+  document.getElementById('btnSubmitCat').innerText = '수정 완료';
+  document.getElementById('btnCancelCatEdit').style.display = 'inline-block';
+  document.getElementById('categoryFormCard').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelCategoryEdit = function() {
+  state.editingCategoryId = null;
+  document.getElementById('catName').value = '';
+  document.getElementById('catBudget').value = '';
+  document.getElementById('catSupport').value = '';
+  document.getElementById('catFormTitle').innerText = '새 예산 항목 추가';
+  document.getElementById('btnSubmitCat').innerText = '+ 항목 등록하기';
+  document.getElementById('btnCancelCatEdit').style.display = 'none';
+  document.getElementById('catErrorMsg').style.display = 'none';
+};
+
+window.deleteCategory = function(id) {
+  state.categories = state.categories.filter(c => c.id !== id);
+  state.expenses = state.expenses.filter(e => e.categoryId !== id);
+  state.openCategoryIds = state.openCategoryIds.filter(openId => openId !== id);
+  if (state.editingCategoryId === id) cancelCategoryEdit();
+  renderCategoryListView();
+  triggerAutoSave();
+};
+
+function getReportData() {
+  const currentYM = state.selectedYearMonth;
+  const [yearStr, monthStr] = currentYM.split('-');
+  const monthNum = parseInt(monthStr, 10);
+  const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
+
+  let incomeRows = [];
+  monthCats.forEach(cat => {
+    incomeRows.push({
+      name: cat.name,
+      amount: cat.budget
+    });
+  });
+
+  let expenseRows = [];
+  monthCats.forEach(cat => {
+    const catExpenses = state.expenses.filter(e => e.categoryId === cat.id && e.date.startsWith(currentYM));
+    const catTotalSpent = catExpenses.reduce((sum, item) => sum + item.amount, 0);
+
+    expenseRows.push({
+      name: cat.name,
+      amount: catTotalSpent
+    });
+  });
+
+  return {
+    yearStr,
+    monthNum,
+    deptName: state.selectedDept || '유초등부',
+    incomeRows,
+    expenseRows
+  };
+}
+
+function renderReportPreviewTable() {
+  const { yearStr, monthNum, deptName, incomeRows, expenseRows } = getReportData();
+
+  document.getElementById('printReportTitle').innerText = `${deptName} ${yearStr}년 ${monthNum}월 결산보고서`;
+
+  const FIXED_ROWS = 10;
+  const tbody = document.getElementById('printReportTableBody');
+  tbody.innerHTML = '';
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+
+  for (let i = 0; i < FIXED_ROWS; i++) {
+    const inc = incomeRows[i];
+    const exp = expenseRows[i];
+
+    if (inc) totalIncome += inc.amount;
+    if (exp) totalExpense += exp.amount;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${inc ? renderShrinkFitText(inc.name, 12) : ''}</td>
+      <td class="text-right col-border-right report-num">${inc ? formatNum(inc.amount) : ''}</td>
+      <td>${exp ? renderShrinkFitText(exp.name, 12) : ''}</td>
+      <td class="text-right report-num">${exp ? formatNum(exp.amount) : ''}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  const remain = totalIncome - totalExpense;
+  document.getElementById('printIncomeTotal').innerText = formatNum(totalIncome);
+  document.getElementById('printExpenseTotal').innerText = formatNum(totalExpense);
+  document.getElementById('printRemainVal').innerText = formatNum(remain);
+
+  const today = new Date();
+  const formattedDateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  document.getElementById('printReportDate').innerText = formattedDateStr;
+}
+
+function renderVoucherPreview() {
+  const currentYM = state.selectedYearMonth;
+  const [yearStr, monthStr] = currentYM.split('-');
+  const monthNum = parseInt(monthStr, 10);
+  const deptName = state.selectedDept || '유초등부';
+
+  const lastDay = new Date(parseInt(yearStr, 10), monthNum, 0).getDate();
+  document.getElementById('vPeriodText').innerText = `${yearStr}년 ${monthNum}월 1일부터 ${yearStr}년 ${monthNum}월 ${lastDay}일 까지`;
+  document.getElementById('vDeptText').innerHTML = `교회학교<br>${deptName}`;
+
+  const bank = (state.voucher && state.voucher.bank) || document.getElementById('vBankName').value || '';
+  const holder = (state.voucher && state.voucher.holder) || document.getElementById('vAccountHolder').value || '';
+  const accNum = (state.voucher && state.voucher.account) || document.getElementById('vAccountNum').value || '';
+  const claimant = (state.voucher && state.voucher.claimant) || document.getElementById('vClaimantInput').value || '';
+
+  document.getElementById('vBankName').value = bank;
+  document.getElementById('vAccountHolder').value = holder;
+  document.getElementById('vAccountNum').value = accNum;
+  document.getElementById('vClaimantInput').value = claimant;
+
+  const bankEl = document.getElementById('vBankCell');
+  const holderEl = document.getElementById('vHolderCell');
+  const accNumEl = document.getElementById('vAccNumCell');
+  const claimantEl = document.getElementById('vClaimantName');
+
+  if (bankEl) bankEl.innerHTML = renderShrinkFitCenter(bank, 7);
+  if (holderEl) holderEl.innerHTML = renderShrinkFitCenter(holder, 5);
+  if (accNumEl) accNumEl.innerHTML = renderShrinkFitCenter(accNum, 14);
+
+  const displayClaimant = claimant || holder || '';
+  if (claimantEl) claimantEl.innerText = displayClaimant ? displayClaimant.split('').join(' ') : '';
+
+  const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
+  const tbody = document.getElementById('vTableBody');
+  tbody.innerHTML = '';
+
+  let totalBudget = 0;
+  const V_FIXED_ROWS = 7;
+
+  for (let i = 0; i < V_FIXED_ROWS; i++) {
+    const cat = monthCats[i];
+    const tr = document.createElement('tr');
+
+    if (cat) {
+      totalBudget += cat.budget;
+      tr.innerHTML = `
+        <td style="text-align: center;">${i === 0 ? '교회학교' : ''}</td>
+        <td>${renderShrinkFitText(cat.name, 16)}</td>
+        <td style="text-align: right; font-weight: 700;">${formatNum(cat.budget)}</td>
+        <td></td>
+      `;
+    } else if (i === monthCats.length && monthCats.length > 0) {
+      tr.innerHTML = `
+        <td style="text-align: center; font-weight: 700;">이</td>
+        <td style="text-align: center; font-weight: 700;">하</td>
+        <td style="text-align: center; font-weight: 700;">여</td>
+        <td style="text-align: center; font-weight: 700;">백</td>
+      `;
+    } else {
+      tr.className = 'empty-row';
+      tr.innerHTML = `
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      `;
+    }
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('vTotalAmountText').innerText = formatNum(totalBudget);
+  document.getElementById('vTotalKoreanText').innerText = `${numberToKorean(totalBudget)} (₩ ${formatNum(totalBudget)})`;
+
+  const today = new Date();
+  const formattedDateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  document.getElementById('vDateStr').innerText = formattedDateStr;
+}
+
+// [스마트 짝맞춤 2열 레이아웃 적용]
+// 1. 해당 항목 내 1~2장 지출건이 2개 이상이면 2개씩 짝지어 1행에 좌/우 2열로 배치
+// 2. 만약 해당 항목 내 1~2장 지출건이 딱 1개뿐이거나, 짝이 안 맞는 마지막 1개는 가로 100%(span 2)로 꽉 채움
+// 3. 영수증이 3장 이상인 대형 지출건도 항상 가로 100%(span 2)로 넉넉히 배치
+// 4. 지출건마다 독립된 카드와 헤더([항목] 적요 / 일자 / 결제자 / 지출금액)를 유지하여 구별 100% 보장
+function renderReceiptsView() {
+  const currentYM = state.selectedYearMonth;
+  const ymText = formatYearMonthText(currentYM);
+  const deptName = state.selectedDept || '유초등부';
+
+  document.getElementById('receiptSheetTitle').innerText = `${deptName} ${ymText} 결산 영수증 증빙서`;
+
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  document.getElementById('receiptSheetPeriod').innerText = `시행일자: ${ymText} | 출력일시: ${todayFormatted}`;
+
+  const container = document.getElementById('receiptGridContainer');
+  container.innerHTML = '';
+
+  const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
+  const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
+  const expensesWithReceipt = monthExpenses.filter(e => getExpenseImages(e).length > 0);
+
+  if (expensesWithReceipt.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      ${ymText}에 등록된 영수증 첨부 내역이 없습니다.<br>
+      [지출 관리] -> [세부내역 기입/관리]에서 영수증 사진을 첨부하시면 이곳에 지출건별 증빙 카드로 정리됩니다.
+    </div>`;
+    return;
+  }
+
+  monthCats.forEach(cat => {
+    const catExpenses = expensesWithReceipt.filter(e => e.categoryId === cat.id);
+    if (catExpenses.length === 0) return;
+
+    let catTotalReceiptCount = 0;
+    let catSubTotal = 0;
+    catExpenses.forEach(e => {
+      catTotalReceiptCount += getExpenseImages(e).length;
+      catSubTotal += e.amount;
+    });
+
+    const groupSection = document.createElement('div');
+    groupSection.className = 'receipt-category-group';
+
+    const groupHeader = document.createElement('div');
+    groupHeader.className = 'receipt-category-title-bar';
+    groupHeader.innerText = ` 항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 총 ${catTotalReceiptCount}장 / 소계: ₩ ${formatNum(catSubTotal)})`;
+    groupSection.appendChild(groupHeader);
+
+    const cardsGrid = document.createElement('div');
+    cardsGrid.className = 'receipt-cards-grid';
+
+    // 해당 항목 내 1~2장 지출건들의 개수 파악
+    const smallCount = catExpenses.filter(e => getExpenseImages(e).length <= 2).length;
+    let smallProcessedIndex = 0;
+
+    catExpenses.forEach((item, expIdx) => {
+      const imgs = getExpenseImages(item);
+      const isMulti = imgs.length > 1;
+      const isSmall = imgs.length <= 2;
+
+      let isSpanFull = false;
+
+      if (imgs.length >= 3) {
+        // 3장 이상 대형 지출건은 항상 가로 100%
+        isSpanFull = true;
+      } else {
+        // 1~2장 지출건인 경우:
+        // 항목 내에 1~2장 지출건이 총 1개뿐이거나, 짝이 안 맞는 마지막 홀수 번째이면 1줄(가로 100%)을 채움!
+        // 짝이 맞는 경우에는 반폭(50%)씩 좌/우로 쏙 들어감!
+        smallProcessedIndex++;
+        if (smallCount === 1 || (smallCount % 2 === 1 && smallProcessedIndex === smallCount)) {
+          isSpanFull = true;
+        } else {
+          isSpanFull = false;
+        }
+      }
+
+      const card = document.createElement('div');
+      card.className = `expense-group-card ${isSpanFull ? 'span-full' : ''}`;
+
+      let gridColsClass = 'cols-1';
+      if (imgs.length === 2) gridColsClass = 'cols-2';
+      else if (imgs.length >= 3) gridColsClass = 'cols-3';
+
+      let photosHtml = '';
+      imgs.forEach((imgUrl, imgIdx) => {
+        const badgeLabel = isMulti ? `영수증 (${imgIdx + 1}/${imgs.length})` : `영수증 증빙 (1장)`;
+        photosHtml += `
+          <div class="receipt-photo-box" onclick="openModal('${imgUrl}', '[${cat.name}] ${item.desc}${isMulti ? ` (${imgIdx+1}/${imgs.length})` : ''}')" title="클릭하여 원본 확대">
+            <img src="${imgUrl}" alt="영수증_${expIdx+1}_${imgIdx+1}">
+            <span class="receipt-photo-badge">${badgeLabel}</span>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div class="expense-group-header">
+          <div class="expense-header-left">
+            <span class="expense-title-text">[${cat.name}] ${item.desc}</span>
+            <span class="expense-meta-info">일자: <strong>${item.date}</strong> | 결제자: <strong>${item.buyer || '-'}</strong> | 첨부: <strong>${imgs.length}장</strong></span>
+          </div>
+          <div class="expense-header-right">
+            <span class="expense-amount-badge">지출액: ₩ ${formatNum(item.amount)}</span>
+          </div>
+        </div>
+        <div class="expense-photos-grid ${gridColsClass}">
+          ${photosHtml}
+        </div>
+      `;
+
+      cardsGrid.appendChild(card);
+    });
+
+    groupSection.appendChild(cardsGrid);
+    container.appendChild(groupSection);
+  });
+}
+
+window.openExpenseGallery = function(expId) {
+  const item = state.expenses.find(e => e.id === expId);
+  if (!item) return;
+  const imgs = getExpenseImages(item);
+  if (imgs.length > 0) {
+    openModal(imgs[0], `${item.desc} (1/${imgs.length})`);
+  }
+};
+
+window.printCurrentView = function(viewTitle) {
+  const toastEl = document.getElementById('toast');
+  if (toastEl) toastEl.style.display = 'none';
+
+  if (state.activeView === 'preview') {
+    renderReportPreviewTable();
+  } else if (state.activeView === 'voucher') {
+    renderVoucherPreview();
+  } else if (state.activeView === 'receipts') {
+    renderReceiptsView();
+  }
+
+  window.print();
+};
+
+window.downloadExcelXml = function() {
+  renderReportPreviewTable();
+  const { yearStr, monthNum, deptName, incomeRows, expenseRows } = getReportData();
+  const FIXED_ROWS = 10;
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+  incomeRows.forEach(r => totalIncome += r.amount);
+  expenseRows.forEach(r => totalExpense += r.amount);
+  const remain = totalIncome - totalExpense;
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  const dateTag = getFormattedDateOnly(today);
+
+  let tableRowsXml = '';
+  for (let i = 0; i < FIXED_ROWS; i++) {
+    const inc = incomeRows[i];
+    const exp = expenseRows[i];
+
+    tableRowsXml += `
+      <Row ss:Height="28">
+        <Cell ss:MergeAcross="2" ss:StyleID="sBodyText"><Data ss:Type="String">${inc ? inc.name : ''}</Data></Cell>
+        <Cell ss:MergeAcross="1" ss:StyleID="sBodyNumRight"><Data ss:Type="${inc ? 'Number' : 'String'}">${inc ? inc.amount : ''}</Data></Cell>
+        <Cell ss:MergeAcross="2" ss:StyleID="sBodyText"><Data ss:Type="String">${exp ? exp.name : ''}</Data></Cell>
+        <Cell ss:MergeAcross="1" ss:StyleID="sBodyNum"><Data ss:Type="${exp ? 'Number' : 'String'}">${exp ? exp.amount : ''}</Data></Cell>
+      </Row>
+    `;
+  }
+
+  const excelXml = `<?xml version="1.0" encoding="utf-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:x="urn:schemas-microsoft-com:office:excel">
+<Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5"/>
+  </Style>
+  <Style ss:ID="sTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="20" ss:Bold="1" ss:Underline="Single"/>
+  </Style>
+  <Style ss:ID="sApprovalSide">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sApprovalHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sApprovalBox">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="sMainHeader">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11.5" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sSubHeader">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sBodyText">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Dot" ss:Weight="1" ss:Color="#666666"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5"/>
+  </Style>
+  <Style ss:ID="sBodyNum">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Dot" ss:Weight="1" ss:Color="#666666"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sBodyNumRight">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Dot" ss:Weight="1" ss:Color="#666666"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sTotalTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sTotalNum">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sRemainTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="10.5" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sRemainNum">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sStatement">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="11.5" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sDate">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="13" ss:Bold="1"/>
+  </Style>
+</Styles>
+<Worksheet ss:Name="결산보고서">
+  <Table ss:DefaultColumnWidth="50" ss:DefaultRowHeight="20">
+   <Column ss:Index="1" ss:Width="55"/>
+   <Column ss:Index="2" ss:Width="55"/>
+   <Column ss:Index="3" ss:Width="55"/>
+   <Column ss:Index="4" ss:Width="50"/>
+   <Column ss:Index="5" ss:Width="50"/>
+   <Column ss:Index="6" ss:Width="25"/>
+   <Column ss:Index="7" ss:Width="60"/>
+   <Column ss:Index="8" ss:Width="60"/>
+   <Column ss:Index="9" ss:Width="60"/>
+   <Column ss:Index="10" ss:Width="60"/>
+   <Row ss:Height="36">
+    <Cell ss:MergeAcross="9" ss:StyleID="sTitle"><Data ss:Type="String">${deptName} ${yearStr}년 ${monthNum}월 결산보고서</Data></Cell>
+   </Row>
+   <Row ss:Height="10"/>
+   <Row ss:Height="24">
+    <Cell ss:Index="6" ss:MergeDown="1" ss:StyleID="sApprovalSide"><Data ss:Type="String">결&#10;재</Data></Cell>
+    <Cell ss:StyleID="sApprovalHead"><Data ss:Type="String">부 장</Data></Cell>
+    <Cell ss:StyleID="sApprovalHead"><Data ss:Type="String">봉사회장</Data></Cell>
+    <Cell ss:StyleID="sApprovalHead"><Data ss:Type="String">부 목 사</Data></Cell>
+    <Cell ss:StyleID="sApprovalHead"><Data ss:Type="String">담임목사</Data></Cell>
+   </Row>
+   <Row ss:Height="48">
+    <Cell ss:Index="7" ss:StyleID="sApprovalBox"/>
+    <Cell ss:StyleID="sApprovalBox"/>
+    <Cell ss:StyleID="sApprovalBox"/>
+    <Cell ss:StyleID="sApprovalBox"/>
+   </Row>
+   <Row ss:Height="10"/>
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="4" ss:StyleID="sMainHeader"><Data ss:Type="String">수 입 (예산)</Data></Cell>
+    <Cell ss:MergeAcross="4" ss:StyleID="sMainHeader"><Data ss:Type="String">결 산</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="2" ss:StyleID="sSubHeader"><Data ss:Type="String">항 목</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sSubHeader"><Data ss:Type="String">금 액</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sSubHeader"><Data ss:Type="String">항 목</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sSubHeader"><Data ss:Type="String">금 액</Data></Cell>
+   </Row>
+   ${tableRowsXml}
+   <Row ss:Height="28">
+    <Cell ss:MergeAcross="2" ss:StyleID="sTotalTitle"><Data ss:Type="String">합 계</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTotalNum"><Data ss:Type="Number">${totalIncome}</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sTotalTitle"><Data ss:Type="String">합 계</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sTotalNum"><Data ss:Type="Number">${totalExpense}</Data></Cell>
+   </Row>
+   <Row ss:Height="8"/>
+   <Row ss:Height="26">
+    <Cell ss:Index="8" ss:StyleID="sRemainTitle"><Data ss:Type="String">잔 액</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sRemainNum"><Data ss:Type="Number">${remain}</Data></Cell>
+   </Row>
+   <Row ss:Height="28"/>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="9" ss:StyleID="sStatement"><Data ss:Type="String">상기와 같이 예산 안대로 수입된 금액을 집행하고 잔액을 교회에 반환 합니다.</Data></Cell>
+   </Row>
+   <Row ss:Height="28">
+    <Cell ss:MergeAcross="9" ss:StyleID="sDate"><Data ss:Type="String">${todayStr}</Data></Cell>
+   </Row>
+  </Table>
+</Worksheet>
+</Workbook>`;
+
+  const fileName = `광양교회_${deptName}_결산보고서_${yearStr}년_${monthNum}월_${dateTag}.xls`;
+  downloadBlob(excelXml, fileName, 'application/vnd.ms-excel;charset=utf-8;');
+};
+
+window.downloadVoucherExcelXml = function() {
+  renderVoucherPreview();
+  const currentYM = state.selectedYearMonth;
+  const [yearStr, monthStr] = currentYM.split('-');
+  const monthNum = parseInt(monthStr, 10);
+  const deptName = state.selectedDept || '유초등부';
+
+  const lastDay = new Date(parseInt(yearStr, 10), monthNum, 0).getDate();
+  const periodStr = `${yearStr}년 ${monthNum}월 1일부터 ${yearStr}년 ${monthNum}월 ${lastDay}일 까지`;
+  const deptStr = `교회학교 ${deptName}`;
+
+  const bank = document.getElementById('vBankName').value || '';
+  const holder = document.getElementById('vAccountHolder').value || '';
+  const accNum = document.getElementById('vAccountNum').value || '';
+  const claimant = document.getElementById('vClaimantInput').value || holder || '';
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  const dateTag = getFormattedDateOnly(today);
+
+  const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
+  let totalBudget = 0;
+  const V_FIXED_ROWS = 7;
+  let rowsXml = '';
+
+  for (let i = 0; i < V_FIXED_ROWS; i++) {
+    const cat = monthCats[i];
+    if (cat) {
+      totalBudget += cat.budget;
+      rowsXml += `
+        <Row ss:Height="28">
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String">${i === 0 ? '교회학교' : ''}</Data></Cell>
+          <Cell ss:MergeAcross="3" ss:StyleID="sVMainLeft"><Data ss:Type="String">${cat.name}</Data></Cell>
+          <Cell ss:MergeAcross="2" ss:StyleID="sVMainRight"><Data ss:Type="Number">${cat.budget}</Data></Cell>
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String"></Data></Cell>
+        </Row>
+      `;
+    } else if (i === monthCats.length && monthCats.length > 0) {
+      rowsXml += `
+        <Row ss:Height="28">
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String">이</Data></Cell>
+          <Cell ss:MergeAcross="3" ss:StyleID="sVMainCenter"><Data ss:Type="String">하</Data></Cell>
+          <Cell ss:MergeAcross="2" ss:StyleID="sVMainCenter"><Data ss:Type="String">여</Data></Cell>
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String">백</Data></Cell>
+        </Row>
+      `;
+    } else {
+      rowsXml += `
+        <Row ss:Height="28">
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String"></Data></Cell>
+          <Cell ss:MergeAcross="3" ss:StyleID="sVMainLeft"><Data ss:Type="String"></Data></Cell>
+          <Cell ss:MergeAcross="2" ss:StyleID="sVMainRight"><Data ss:Type="String"></Data></Cell>
+          <Cell ss:StyleID="sVMainCenter"><Data ss:Type="String"></Data></Cell>
+        </Row>
+      `;
+    }
+  }
+
+  const voucherXml = `<?xml version="1.0" encoding="utf-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:x="urn:schemas-microsoft-com:office:excel">
+<Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sVTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="22" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVApprovalSide">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVApprovalHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sVApprovalBox">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="sVMetaHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sVMetaCell">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sVAmountCell">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="12" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVMainHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <Interior ss:Color="#FAFAFA" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sVMainCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sVMainLeft">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:ShrinkToFit="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sVMainRight">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="11" ss:Bold="1"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sVTotalTitle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="12" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVTotalVal">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"/>
+   </Borders>
+   <Font ss:FontName="맑은 고딕" ss:Size="13" ss:Bold="1"/>
+   <NumberFormat ss:Format="#,##0"/>
+  </Style>
+  <Style ss:ID="sVStatement">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="12" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVDate">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="13" ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="sVClaimantRight">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Font ss:FontName="맑은 고딕" ss:Size="13" ss:Bold="1"/>
+  </Style>
+</Styles>
+<Worksheet ss:Name="지출결의서">
+  <Table ss:DefaultColumnWidth="60" ss:DefaultRowHeight="24">
+   <Column ss:Index="1" ss:Width="75"/>
+   <Column ss:Index="2" ss:Width="65"/>
+   <Column ss:Index="3" ss:Width="65"/>
+   <Column ss:Index="4" ss:Width="65"/>
+   <Column ss:Index="5" ss:Width="25"/>
+   <Column ss:Index="6" ss:Width="65"/>
+   <Column ss:Index="7" ss:Width="65"/>
+   <Column ss:Index="8" ss:Width="65"/>
+   <Column ss:Index="9" ss:Width="65"/>
+
+   <Row ss:Height="34">
+    <Cell ss:MergeAcross="3" ss:MergeDown="1" ss:StyleID="sVTitle"><Data ss:Type="String">지  출  결  의  서</Data></Cell>
+    <Cell ss:MergeDown="1" ss:StyleID="sVApprovalSide"><Data ss:Type="String">결&#10;재</Data></Cell>
+    <Cell ss:StyleID="sVApprovalHead"><Data ss:Type="String">부 장</Data></Cell>
+    <Cell ss:StyleID="sVApprovalHead"><Data ss:Type="String">봉사회장</Data></Cell>
+    <Cell ss:StyleID="sVApprovalHead"><Data ss:Type="String">부목사</Data></Cell>
+    <Cell ss:StyleID="sVApprovalHead"><Data ss:Type="String">담임목사</Data></Cell>
+   </Row>
+   <Row ss:Height="54">
+    <Cell ss:Index="6" ss:StyleID="sVApprovalBox"/>
+    <Cell ss:StyleID="sVApprovalBox"/>
+    <Cell ss:StyleID="sVApprovalBox"/>
+    <Cell ss:StyleID="sVApprovalBox"/>
+   </Row>
+   <Row ss:Height="14"/>
+
+   <Row ss:Height="28">
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">시행기간</Data></Cell>
+    <Cell ss:MergeAcross="3" ss:StyleID="sVMetaCell"><Data ss:Type="String">${periodStr}</Data></Cell>
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">시행부서</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sVMetaCell"><Data ss:Type="String">${deptStr}</Data></Cell>
+   </Row>
+   <Row ss:Height="28">
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">지불방법</Data></Cell>
+    <Cell ss:StyleID="sVMetaCell"><Data ss:Type="String">계좌 이체</Data></Cell>
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">은행명</Data></Cell>
+    <Cell ss:StyleID="sVMetaCell"><Data ss:Type="String">${bank}</Data></Cell>
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">예금주</Data></Cell>
+    <Cell ss:StyleID="sVMetaCell"><Data ss:Type="String">${holder}</Data></Cell>
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">계좌번호</Data></Cell>
+    <Cell ss:MergeAcross="1" ss:StyleID="sVMetaCell"><Data ss:Type="String">${accNum}</Data></Cell>
+   </Row>
+   <Row ss:Height="30">
+    <Cell ss:StyleID="sVMetaHead"><Data ss:Type="String">지출금액</Data></Cell>
+    <Cell ss:MergeAcross="7" ss:StyleID="sVAmountCell"><Data ss:Type="String">${numberToKorean(totalBudget)} (₩ ${formatNum(totalBudget)})</Data></Cell>
+   </Row>
+   <Row ss:Height="12"/>
+
+   <Row ss:Height="28">
+    <Cell ss:StyleID="sVMainHead"><Data ss:Type="String">계정과목</Data></Cell>
+    <Cell ss:MergeAcross="3" ss:StyleID="sVMainHead"><Data ss:Type="String">적 요</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sVMainHead"><Data ss:Type="String">금 액</Data></Cell>
+    <Cell ss:StyleID="sVMainHead"><Data ss:Type="String">비 고</Data></Cell>
+   </Row>
+
+   ${rowsXml}
+
+   <Row ss:Height="30">
+    <Cell ss:StyleID="sVTotalTitle"><Data ss:Type="String">합 계</Data></Cell>
+    <Cell ss:MergeAcross="3" ss:StyleID="sVTotalTitle"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="sVTotalVal"><Data ss:Type="Number">${totalBudget}</Data></Cell>
+    <Cell ss:StyleID="sVTotalTitle"><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:Height="32"/>
+
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="8" ss:StyleID="sVStatement"><Data ss:Type="String">위 금액을 청구하오니 지급하여 주시기 바랍니다.</Data></Cell>
+   </Row>
+   <Row ss:Height="20"/>
+   <Row ss:Height="28">
+    <Cell ss:MergeAcross="8" ss:StyleID="sVDate"><Data ss:Type="String">${todayStr}</Data></Cell>
+   </Row>
+   <Row ss:Height="20"/>
+   <Row ss:Height="30">
+    <Cell ss:MergeAcross="8" ss:StyleID="sVClaimantRight"><Data ss:Type="String">청구인  ${claimant ? claimant.split('').join(' ') : ''}  (인)      </Data></Cell>
+   </Row>
+  </Table>
+</Worksheet>
+</Workbook>`;
+
+  const fileName = `광양교회_${deptName}_지출결의서_${yearStr}년_${monthNum}월_${dateTag}.xls`;
+  downloadBlob(voucherXml, fileName, 'application/vnd.ms-excel;charset=utf-8;');
+};
+
+// [엑셀 MHTML 저장 유지] 엑셀에서 열 때 멀티파트 인라인 이미지를 통해 사진이 엑스박스 없이 표시되도록 구성
+window.downloadReceiptsExcelXml = function() {
+  const currentYM = state.selectedYearMonth;
+  const [yearStr, monthStr] = currentYM.split('-');
+  const monthNum = parseInt(monthStr, 10);
+  const deptName = state.selectedDept || '유초등부';
+  const ymText = `${yearStr}년 ${monthNum}월`;
+
+  const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
+  const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
+  const expensesWithReceipt = monthExpenses.filter(e => getExpenseImages(e).length > 0);
+
+  if (expensesWithReceipt.length === 0) {
+    alert(`${ymText}에 등록된 영수증 증빙 내역이 없습니다.`);
+    return;
+  }
+
+  const boundary = "----=_NextPart_GwangyangChurch_" + Date.now();
+  let imageParts = [];
+  let tableRowsHtml = '';
+  let totalProofSum = 0;
+  let totalProofCount = 0;
+  let imageCounter = 0;
+
+  monthCats.forEach(cat => {
+    const catExpenses = expensesWithReceipt.filter(e => e.categoryId === cat.id);
+    if (catExpenses.length === 0) return;
+
+    const catSubTotal = catExpenses.reduce((sum, it) => sum + it.amount, 0);
+    let catImgsCount = 0;
+    catExpenses.forEach(it => catImgsCount += getExpenseImages(it).length);
+
+    totalProofSum += catSubTotal;
+    totalProofCount += catImgsCount;
+
+    tableRowsHtml += `
+      <tr style="background-color: #EFF6FF;">
+        <th colspan="7" style="border: 2px solid #0F52BA; text-align: left; padding: 10px; font-size: 13pt; color: #0F52BA;">
+          항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 총 ${catImgsCount}장 / 소계: ₩ ${formatNum(catSubTotal)})
+        </th>
+      </tr>
+      <tr style="background-color: #F8FAFC;">
+        <th style="border: 1px solid #000; width: 45px; text-align: center; font-size: 10pt;">순번</th>
+        <th style="border: 1px solid #000; width: 85px; text-align: center; font-size: 10pt;">일자</th>
+        <th style="border: 1px solid #000; width: 180px; text-align: center; font-size: 10pt;">지출내역(적요)</th>
+        <th style="border: 1px solid #000; width: 80px; text-align: center; font-size: 10pt;">결제자</th>
+        <th style="border: 1px solid #000; width: 100px; text-align: center; font-size: 10pt;">결제금액</th>
+        <th style="border: 1px solid #000; width: 75px; text-align: center; font-size: 10pt;">증빙순번</th>
+        <th style="border: 1px solid #000; width: 320px; text-align: center; font-size: 10pt;">영수증 증빙 사진</th>
+      </tr>
+    `;
+
+    catExpenses.forEach((item, expIdx) => {
+      const imgs = getExpenseImages(item);
+      const spanCount = imgs.length;
+
+      imgs.forEach((imgUrl, imgIdx) => {
+        imageCounter++;
+        const contentLocation = `receipt_img_${imageCounter}.jpg`;
+
+        let mime = 'image/jpeg';
+        let base64Pure = '';
+        const match = imgUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          mime = match[1];
+          base64Pure = match[2];
+        } else {
+          base64Pure = imgUrl;
+        }
+
+        imageParts.push(
+          `--${boundary}\r\n` +
+          `Content-Type: ${mime}\r\n` +
+          `Content-Transfer-Encoding: base64\r\n` +
+          `Content-Location: ${contentLocation}\r\n\r\n` +
+          `${base64Pure}\r\n`
+        );
+
+        if (imgIdx === 0) {
+          tableRowsHtml += `
+            <tr style="height: 180px;">
+              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${expIdx + 1}</td>
+              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.date}</td>
+              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: left; vertical-align: middle; padding: 6px; background-color: #fff;">
+                <b>${item.desc}</b><br>
+                <span style="font-size: 9pt; color: #64748B;">(첨부 영수증 총 ${spanCount}장)</span>
+              </td>
+              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.buyer || '-'}</td>
+              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: right; vertical-align: middle; font-weight: bold; font-size: 11pt; padding-right: 8px; background-color: #fff; color: #0F52BA;">
+                ₩ ${formatNum(item.amount)}
+              </td>
+              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
+              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
+                <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
+              </td>
+            </tr>
+          `;
+        } else {
+          tableRowsHtml += `
+            <tr style="height: 180px;">
+              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
+              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
+                <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
+              </td>
+            </tr>
+          `;
+        }
+      });
+    });
+
+    tableRowsHtml += `<tr><td colspan="7" style="height: 14px;"></td></tr>`;
+  });
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+  const dateTag = getFormattedDateOnly(today);
+
+  const htmlContent = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <!--[if gte mso 9]>
+      <xml>
+        <x:ExcelWorkbook>
+          <x:ExcelWorksheets>
+            <x:ExcelWorksheet>
+              <x:Name>영수증증빙</x:Name>
+              <x:WorksheetOptions>
+                <x:DisplayGridlines/>
+              </x:WorksheetOptions>
+            </x:ExcelWorksheet>
+          </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <style>
+        body { font-family: '맑은 고딕', sans-serif; }
+        table { border-collapse: collapse; }
+      </style>
+    </head>
+    <body>
+      <table>
+        <tr>
+          <th colspan="7" style="font-size: 20pt; font-weight: bold; text-align: center; padding: 15px 0;">
+            ${deptName} ${ymText} 결산 영수증 증빙서
+          </th>
+        </tr>
+        <tr>
+          <td colspan="7" style="text-align: center; color: #475569; font-size: 11pt; padding-bottom: 12px;">
+            부서: ${deptName} | 대상연월: ${ymText} | 출력일시: ${todayStr} | 영수증 총 ${totalProofCount}장
+          </td>
+        </tr>
+        ${tableRowsHtml}
+        <tr style="background-color: #F1F5F9; height: 35px;">
+          <th colspan="4" style="border: 2px solid #000; text-align: center; font-size: 12pt;">
+            영수증 첨부 증빙 합계 총액 (총 ${totalProofCount}장)
+          </th>
+          <th colspan="3" style="border: 2px solid #000; text-align: right; font-size: 13pt; color: #0F52BA; padding-right: 14px;">
+            ₩ ${formatNum(totalProofSum)}
+          </th>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const mhtmlDoc =
+    `MIME-Version: 1.0\r\n` +
+    `X-Document-Type: Workbook\r\n` +
+    `Content-Type: multipart/related; boundary="${boundary}"\r\n\r\n` +
+    `--${boundary}\r\n` +
+    `Content-Type: text/html; charset="utf-8"\r\n` +
+    `Content-Transfer-Encoding: 8bit\r\n` +
+    `Content-Location: main.html\r\n\r\n` +
+    `${htmlContent}\r\n\r\n` +
+    imageParts.join('') +
+    `--${boundary}--\r\n`;
+
+  const fileName = `광양교회_${deptName}_영수증증빙서_${yearStr}년_${monthNum}월_${dateTag}.xls`;
+  downloadBlob(mhtmlDoc, fileName, 'application/vnd.ms-excel;charset=utf-8;');
+  showToast(` 영수증 증빙 엑셀 파일이 저장되었습니다.`);
+};
+
+window.openModal = function(imgSrc, title) {
+  document.getElementById('modalReceiptImg').src = imgSrc;
+  document.getElementById('modalReceiptTitle').innerText = `${title} - 영수증 확인`;
+  document.getElementById('receiptModal').classList.add('active');
+};
+
+window.closeModal = function(e) {
+  if (e && e.target !== e.currentTarget && e.target.tagName !== 'BUTTON') return;
+  document.getElementById('receiptModal').classList.remove('active');
+};
+
+loadFromLocalStorage();
+
+document.getElementById('selectedMonthInput').value = state.selectedYearMonth;
+if (document.getElementById('deptSelect')) {
+  document.getElementById('deptSelect').value = state.selectedDept || '유초등부';
+}
+if (document.getElementById('voucherDeptSelect')) {
+  document.getElementById('voucherDeptSelect').value = state.selectedDept || '유초등부';
+}
+if (document.getElementById('receiptDeptSelect')) {
+  document.getElementById('receiptDeptSelect').value = state.selectedDept || '유초등부';
+}
+
+if (state.voucher) {
+  document.getElementById('vBankName').value = state.voucher.bank || '';
+  document.getElementById('vAccountHolder').value = state.voucher.holder || '';
+  document.getElementById('vAccountNum').value = state.voucher.account || '';
+  document.getElementById('vClaimantInput').value = state.voucher.claimant || '';
+}
+
+updateBackupCountBadge();
+renderCategoryListView();
+</script>
+</body>
+</html>
