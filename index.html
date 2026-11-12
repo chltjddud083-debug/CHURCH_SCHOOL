@@ -84,6 +84,37 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+/* 지출 관리 내부 서브 탭 */
+.manage-sub-tabs {
+  display: flex;
+  background-color: #F1F5F9;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+.sub-tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.sub-tab-btn.active {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+}
+.sub-tab-btn.reserve-active {
+  background-color: #047857;
+  color: #FFFFFF;
+}
+
 .backup-bar {
   background-color: #FFFFFF;
   border: 1px solid var(--border-color);
@@ -224,6 +255,11 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   padding: 16px;
   margin-bottom: 14px;
   box-shadow: 0 4px 12px rgba(15, 82, 186, 0.15);
+  transition: background 0.3s ease;
+}
+.month-summary-card.reserve-mode {
+  background: linear-gradient(135deg, #047857 0%, #064E3B 100%);
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
 }
 .month-summary-title {
   font-size: 12.5px;
@@ -262,6 +298,67 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 .month-summary-grid strong {
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
+}
+
+/* 예비비 전용 3열 요약 그리드 */
+.reserve-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+}
+.reserve-summary-grid span {
+  display: block;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.reserve-summary-grid strong {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 예비비 기준 초기 이월 잔액 설정 카드 */
+.carryover-setting-box {
+  background-color: #ECFDF5;
+  border: 1.5px solid #A7F3D0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.carryover-setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #065F46;
+}
+.carryover-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.type-badge {
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.type-badge.income {
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+.type-badge.expense {
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
 }
 
 .category-card {
@@ -510,6 +607,9 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   font-size: 14px;
   font-weight: 600;
   margin-top: 4px;
+}
+.btn-primary.reserve {
+  background-color: #047857;
 }
 .btn-primary:active {
   opacity: 0.9;
@@ -1007,7 +1107,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   }
 }
 
-/* 3. 영수증 증빙 모아보기 서식 (스마트 반응형 2열 그리드) */
+/* 3. 영수증 증빙 서식 */
 .receipt-sheet-header {
   text-align: center;
   margin-bottom: 14px;
@@ -1023,7 +1123,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 .receipt-category-group {
   margin-bottom: 18px;
 }
-/* 항목 제목 바: 시인성 극대화 */
 .receipt-category-title-bar {
   background-color: #EEF2FF;
   border-left: 5px solid var(--accent-color);
@@ -1040,7 +1139,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   break-after: avoid !important;
 }
 
-/* 항목 내 세부 지출 카드들을 2열로 배치하는 그리드 */
 .receipt-cards-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1049,7 +1147,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   break-inside: auto !important;
 }
 
-/* 각 세부 지출 1건을 완전히 둘러싸는 독립 카드 (구별 100% 보장) */
 .expense-group-card {
   border: 1.5px solid #000;
   background-color: #fff;
@@ -1060,12 +1157,10 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   display: flex;
   flex-direction: column;
 }
-/* 혼자 남은 단일 지출건이거나 3장 이상인 대형 지출건은 가로 100%(span 2)로 꽉 채움 */
 .expense-group-card.span-full {
   grid-column: span 2;
 }
 
-/* 세부 지출 헤더: 지출 적요와 금액이 1번만 단일 표기되어 명확히 구별됨 */
 .expense-group-header {
   background-color: #F8FAFC;
   border-bottom: 1.2px solid #000;
@@ -1113,7 +1208,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   white-space: nowrap;
 }
 
-/* 카드 내부 영수증 사진 배치 그리드 */
 .expense-photos-grid {
   display: grid;
   padding: 6px;
@@ -1163,7 +1257,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   text-align: center;
 }
 
-/* 영수증 미첨부 안내 박스 스타일 */
 .receipt-no-photo-box {
   border: 1.5px dashed #CBD5E1;
   background-color: #F8FAFC;
@@ -1181,13 +1274,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   font-size: 26px;
   opacity: 0.8;
 }
-.receipt-no-photo-box .no-photo-text {
+.receipt-no-photo-text {
   font-size: 13.5px;
   font-weight: 700;
   color: #64748B;
   letter-spacing: -0.3px;
 }
-.receipt-no-photo-box .no-photo-sub {
+.receipt-no-photo-sub {
   font-size: 11px;
   color: #94A3B8;
 }
@@ -1239,8 +1332,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     page-break-after: avoid !important;
     break-inside: avoid !important;
   }
-
-  /* 인쇄 시 1행 2열로 꽉 차게 들어가며 여백 낭비 제로 및 카드 쪼개짐 완벽 방지 */
   .receipt-category-title-bar {
     page-break-after: avoid !important;
     break-after: avoid !important;
@@ -1412,54 +1503,129 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 
   <!-- 1. 지출 관리 메인 화면 -->
   <div id="viewManageArea">
-    <section class="month-summary-card">
-      <div class="month-summary-title"><span id="bannerMonthTitle"></span> 수입 및 결산 현황</div>
-      <div class="month-summary-main">
-        <span class="month-spent-val" id="bannerTotalSpent">0원</span>
-        <span class="month-remain-val" id="bannerTotalRemain">잔액 0원</span>
-      </div>
-      <div class="month-summary-grid">
-        <div><span>총 재원 (예산+찬조)</span><strong id="bannerTotalIncome">0원</strong></div>
-        <div><span>총 지출 (집행)</span><strong id="bannerTotalExpense">0원</strong></div>
-        <div><span>송금완료 / 본인</span><strong id="bannerDoneTransfers" style="color: #6EE7B7;">0원</strong></div>
-        <div><span>송금 대기</span><strong id="bannerPendingTransfers" style="color: #FCD34D;">0원</strong></div>
-      </div>
-    </section>
-
-    <section class="card" id="categoryFormCard">
-      <h2 class="card-title" id="catFormTitle" style="margin-bottom: 12px;">새 예산 항목 추가</h2>
-      <div class="form-grid">
-        <div class="form-group col-span-2">
-          <label for="catName">항목명</label>
-          <input type="text" id="catName" class="form-control" placeholder="예: 간식비, 물품구매, 활동비 등">
-        </div>
-        <div class="form-group">
-          <label for="catBudget">배정 예산 (원)</label>
-          <input type="number" id="catBudget" class="form-control" placeholder="0" min="0" step="1000">
-        </div>
-        <div class="form-group">
-          <label for="catSupport">찬조금 (원) <span style="font-size: 11px; color: var(--support-color); font-weight: normal;">*참고용·잔액반영</span></label>
-          <input type="number" id="catSupport" class="form-control" placeholder="0" min="0" step="1000">
-        </div>
-        <div class="col-span-2">
-          <div id="catErrorMsg" class="form-msg">항목명과 예산 금액을 올바르게 입력해 주세요.</div>
-        </div>
-        <div class="form-group col-span-2 form-btn-row">
-          <button type="button" id="btnSubmitCat" class="btn-primary" onclick="handleSaveCategory()">+ 항목 등록하기</button>
-          <button type="button" id="btnCancelCatEdit" class="btn-secondary" style="display:none;" onclick="cancelCategoryEdit()">취소</button>
-        </div>
-      </div>
-    </section>
-
-    <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-size: 14px; font-weight: 700;">항목별 현황 (클릭 시 세부내역 확인)</span>
-      <span id="catTotalSummary" style="font-size: 12px; color: var(--ink-secondary);"></span>
+    <!-- 지출 관리 2단 서브 탭: 교회학교 지출 관리 / 예비비 지출 관리 -->
+    <div class="manage-sub-tabs no-print">
+      <button type="button" class="sub-tab-btn active" id="subTabSchoolBtn" onclick="switchManageScope('school')">교회학교 지출 관리</button>
+      <button type="button" class="sub-tab-btn" id="subTabReserveBtn" onclick="switchManageScope('reserve')">예비비 지출 관리</button>
     </div>
 
-    <div id="categoryCardsContainer"></div>
+    <!-- ================= [A] 교회학교 지출 관리 영역 ================= -->
+    <div id="schoolManageSection">
+      <section class="month-summary-card">
+        <div class="month-summary-title"><span id="bannerMonthTitle"></span> 수입 및 결산 현황</div>
+        <div class="month-summary-main">
+          <span class="month-spent-val" id="bannerTotalSpent">0원</span>
+          <span class="month-remain-val" id="bannerTotalRemain">잔액 0원</span>
+        </div>
+        <div class="month-summary-grid">
+          <div><span>총 재원 (예산+찬조)</span><strong id="bannerTotalIncome">0원</strong></div>
+          <div><span>총 지출 (집행)</span><strong id="bannerTotalExpense">0원</strong></div>
+          <div><span>송금완료 / 본인</span><strong id="bannerDoneTransfers" style="color: #6EE7B7;">0원</strong></div>
+          <div><span>송금 대기</span><strong id="bannerPendingTransfers" style="color: #FCD34D;">0원</strong></div>
+        </div>
+      </section>
+
+      <section class="card" id="categoryFormCard">
+        <h2 class="card-title" id="catFormTitle" style="margin-bottom: 12px;">새 예산 항목 추가</h2>
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label for="catName">항목명</label>
+            <input type="text" id="catName" class="form-control" placeholder="예: 간식비, 물품구매, 활동비 등">
+          </div>
+          <div class="form-group">
+            <label for="catBudget">배정 예산 (원)</label>
+            <input type="number" id="catBudget" class="form-control" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="form-group">
+            <label for="catSupport">찬조금 (원) <span style="font-size: 11px; color: var(--support-color); font-weight: normal;">*참고용·잔액반영</span></label>
+            <input type="number" id="catSupport" class="form-control" placeholder="0" min="0" step="1000">
+          </div>
+          <div class="col-span-2">
+            <div id="catErrorMsg" class="form-msg">항목명과 예산 금액을 올바르게 입력해 주세요.</div>
+          </div>
+          <div class="form-group col-span-2 form-btn-row">
+            <button type="button" id="btnSubmitCat" class="btn-primary" onclick="handleSaveCategory()">+ 항목 등록하기</button>
+            <button type="button" id="btnCancelCatEdit" class="btn-secondary" style="display:none;" onclick="cancelCategoryEdit()">취소</button>
+          </div>
+        </div>
+      </section>
+
+      <div style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size: 14px; font-weight: 700;">항목별 현황 (클릭 시 세부내역 확인)</span>
+        <span id="catTotalSummary" style="font-size: 12px; color: var(--ink-secondary);"></span>
+      </div>
+
+      <div id="categoryCardsContainer"></div>
+    </div>
+
+    <!-- ================= [B] 예비비 지출 관리 영역 ================= -->
+    <div id="reserveManageSection" style="display: none;">
+      <!-- 예비비 당월 요약 카드: 전월이월 + 당월수입 - 당월지출 = 총 잔액 -->
+      <section class="month-summary-card reserve-mode">
+        <div class="month-summary-title"><span id="reserveBannerMonthTitle"></span> 예비비 결산 현황</div>
+        <div class="month-summary-main">
+          <span class="month-spent-val" id="reserveFinalRemainVal">0원</span>
+          <span class="month-remain-val">잔액</span>
+        </div>
+        <div class="reserve-summary-grid">
+          <div><span>전월 이월액</span><strong id="reserveCarryoverVal">0원</strong></div>
+          <div><span>당월 수입 (+)</span><strong id="reserveTotalIncomeVal" style="color: #6EE7B7;">0원</strong></div>
+          <div><span>당월 지출 (-)</span><strong id="reserveTotalExpenseVal" style="color: #FCD34D;">0원</strong></div>
+        </div>
+      </section>
+
+      <!-- 예비비 수입/지출 등록 폼 -->
+      <section class="card" id="reserveFormCard">
+        <h2 class="card-title" id="reserveFormTitle" style="margin-bottom: 12px; color: #047857;">+ 예비비 수입 / 지출 내역 등록</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>구분 (수입 / 지출)</label>
+            <select id="reserveType" class="form-control" style="font-weight: 700;">
+              <option value="expense">지출 (-)</option>
+              <option value="income">수입 (+)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>금액 (원)</label>
+            <input type="number" id="reserveAmount" class="form-control" placeholder="0" min="0" step="100">
+          </div>
+          <div class="form-group col-span-2">
+            <label>내역 (적요)</label>
+            <input type="text" id="reserveDesc" class="form-control" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>일자</label>
+            <input type="date" id="reserveDate" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>처리자 / 결제자</label>
+            <input type="text" id="reservePerson" class="form-control" placeholder="성명">
+          </div>
+          <div class="form-group col-span-2">
+            <label>영수증 / 증빙 사진 첨부 (선택)</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="reserveReceipt" class="form-control" accept="image/*" multiple style="padding-top: 6px;" onchange="handleReserveReceiptMultiSelect(this)">
+              <div id="reserveFormMultiPreviewStrip" class="multi-preview-strip"></div>
+              <button type="button" id="reserveBtnClearAllReceipts" class="btn-action-icon del" style="display:none; align-self: flex-start;" onclick="clearAllReserveReceiptImages()">영수증 전체 삭제</button>
+            </div>
+            <div id="reserveErrorMsg" class="form-msg">내용, 금액, 일자, 처리자를 모두 입력해 주세요.</div>
+          </div>
+          <div class="form-group col-span-2 form-btn-row">
+            <button type="button" id="btnSubmitReserve" class="btn-primary reserve" onclick="handleSaveReserveRecord()">내역 저장</button>
+            <button type="button" id="btnCancelReserveEdit" class="btn-secondary" style="display:none;" onclick="cancelReserveRecordEdit()">취소</button>
+          </div>
+        </div>
+      </section>
+
+      <div style="margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size: 15px; font-weight: 700; color: #047857;">해당 월 예비비 수입 및 지출 목록</h3>
+        <span id="reserveRecordCount" style="font-size: 13px; color: var(--ink-secondary);">0건</span>
+      </div>
+      <div id="reserveRecordsContainer"></div>
+    </div>
   </div>
 
-  <!-- 2. 세부 지출 작성 화면 -->
+  <!-- 2. 세부 지출 작성 화면 (교회학교 전용) -->
   <div id="viewDetailInputArea" style="display: none;">
     <div class="sub-view-nav">
       <button type="button" class="btn-back-main" onclick="backToMainManage()">‹ 항목 목록으로 돌아가기</button>
@@ -1516,7 +1682,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     <div id="subExpenseListContainer"></div>
   </div>
 
-  <!-- 3. A4 지출결의서 양식 뷰 -->
+  <!-- 3. A4 지출결의서 양식 뷰 (교회학교 지출만 연계) -->
   <div id="viewVoucherPreview" style="display: none;">
     <div class="report-view-actions no-print">
       <div class="dept-selector-group">
@@ -1633,7 +1799,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     </div>
   </div>
 
-  <!-- 4. A4 결산보고서 양식 뷰 -->
+  <!-- 4. A4 결산보고서 양식 뷰 (교회학교 지출만 연계) -->
   <div id="viewReportPreview" style="display: none;">
     <div class="report-view-actions no-print">
       <div class="dept-selector-group">
@@ -1718,7 +1884,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     </div>
   </div>
 
-  <!-- 5. 영수증 증빙 모아보기 양식 뷰 -->
+  <!-- 5. 영수증 증빙 모아보기 양식 뷰 (교회학교 지출만 연계) -->
   <div id="viewReceiptsArea" style="display: none;">
     <div class="report-view-actions no-print">
       <div class="dept-selector-group">
@@ -1741,9 +1907,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
           <div style="font-size: 13px; color: var(--ink-secondary); margin-top: 4px;" id="receiptSheetPeriod"></div>
         </div>
 
-        <div id="receiptGridContainer">
-          <!-- 동적 짝맞춤 그리드 렌더링 -->
-        </div>
+        <div id="receiptGridContainer"></div>
       </div>
     </div>
   </div>
@@ -1797,12 +1961,16 @@ const initYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0
 
 const defaultState = {
   activeView: 'manage',
+  manageScope: 'school', // 'school' | 'reserve'
   selectedDept: '유초등부',
   selectedYearMonth: initYM,
   openCategoryIds: [],
   currentSubCategoryId: null,
   editingCategoryId: null,
   editingExpenseId: null,
+  editingReserveRecordId: null,
+  // 예비비 기준 초기 이월 잔액 (수정 가능)
+  initialReserveBalance: 500000,
   voucher: {
     bank: '',
     holder: '',
@@ -1810,7 +1978,9 @@ const defaultState = {
     claimant: ''
   },
   categories: [],
-  expenses: []
+  expenses: [],
+  // 예비비 전용 수입/지출 내역
+  reserveRecords: []
 };
 
 let state = JSON.parse(JSON.stringify(defaultState));
@@ -1841,6 +2011,10 @@ function sanitizeState(parsed) {
   const s = { ...defaultState, ...parsed };
   if (!Array.isArray(s.categories)) s.categories = [];
   s.expenses = migrateExpenses(s.expenses);
+  if (!Array.isArray(s.reserveRecords)) s.reserveRecords = [];
+  s.reserveRecords = migrateExpenses(s.reserveRecords);
+  if (typeof s.initialReserveBalance !== 'number') s.initialReserveBalance = 500000;
+  if (!s.manageScope) s.manageScope = 'school';
   if (!s.voucher) s.voucher = { bank: '', holder: '', account: '', claimant: '' };
   return s;
 }
@@ -1929,6 +2103,317 @@ function renderShrinkFitCenter(text, normalLimit = 10) {
     <span style="display:block; font-size:${fontSize}; line-height:1.2; word-break:break-all; width:100%;">${str}</span>
   </div>`;
 }
+
+// 서브 탭 전환: 교회학교 지출 관리 <-> 예비비 지출 관리
+window.switchManageScope = function(scope) {
+  state.manageScope = scope;
+  cancelCategoryEdit();
+  cancelSubExpenseEdit();
+  cancelReserveRecordEdit();
+
+  const schoolBtn = document.getElementById('subTabSchoolBtn');
+  const reserveBtn = document.getElementById('subTabReserveBtn');
+  const schoolSec = document.getElementById('schoolManageSection');
+  const reserveSec = document.getElementById('reserveManageSection');
+
+  if (scope === 'school') {
+    schoolBtn.classList.add('active');
+    reserveBtn.classList.remove('reserve-active');
+    schoolSec.style.display = 'block';
+    reserveSec.style.display = 'none';
+    renderCategoryListView();
+  } else {
+    schoolBtn.classList.remove('active');
+    reserveBtn.classList.add('reserve-active');
+    schoolSec.style.display = 'none';
+    reserveSec.style.display = 'block';
+    renderReserveManageView();
+  }
+};
+
+// ==================== [예비비 전용 로직] ====================
+
+// 전월까지의 예비비 누적 이월 잔액 계산: 이전달 누적 수입 합 - 이전달 누적 지출 합
+function calculateReserveCarryover(currentYM) {
+  let carryover = 0;
+  const records = state.reserveRecords || [];
+
+  records.forEach(r => {
+    const ym = r.date ? r.date.slice(0, 7) : '';
+    if (ym && ym < currentYM) {
+      if (r.type === 'income') {
+        carryover += r.amount;
+      } else {
+        carryover -= r.amount;
+      }
+    }
+  });
+
+  return carryover;
+}
+
+// 예비비 초기 이월 잔액 저장 (수정 가능)
+window.saveInitialReserveBalance = function() {
+  const inputEl = document.getElementById('initialReserveBalanceInput');
+  const val = parseInt(inputEl.value, 10);
+  if (isNaN(val)) {
+    alert('올바른 금액을 입력해 주세요.');
+    return;
+  }
+  state.initialReserveBalance = val;
+  renderReserveManageView();
+  triggerAutoSave();
+  showToast(`예비비 초기 기준 잔액이 [${formatWon(val)}]으로 저장되었습니다.`);
+};
+
+// 예비비 지출 관리 뷰 렌더링
+function renderReserveManageView() {
+  const currentYM = state.selectedYearMonth;
+  const ymText = formatYearMonthText(currentYM);
+
+  document.getElementById('reserveBannerMonthTitle').innerText = ymText;
+  document.getElementById('reserveDate').value = `${currentYM}-01`;
+
+  // 1. 전월 이월액 계산
+  const carryover = calculateReserveCarryover(currentYM);
+
+  // 2. 당월 수입/지출 합산
+  const monthRecords = (state.reserveRecords || []).filter(r => r.date && r.date.startsWith(currentYM));
+  let monthIncome = 0;
+  let monthExpense = 0;
+
+  monthRecords.forEach(r => {
+    if (r.type === 'income') {
+      monthIncome += r.amount;
+    } else {
+      monthExpense += r.amount;
+    }
+  });
+
+  // 총 잔액 = 이월 + 수입 - 지출
+  const finalRemain = carryover + monthIncome - monthExpense;
+
+  document.getElementById('reserveCarryoverVal').innerText = formatWon(carryover);
+  document.getElementById('reserveTotalIncomeVal').innerText = formatWon(monthIncome);
+  document.getElementById('reserveTotalExpenseVal').innerText = formatWon(monthExpense);
+  document.getElementById('reserveFinalRemainVal').innerText = formatWon(finalRemain);
+
+  // 3. 당월 목록 렌더링
+  const container = document.getElementById('reserveRecordsContainer');
+  const countEl = document.getElementById('reserveRecordCount');
+  container.innerHTML = '';
+  countEl.innerText = `${ymText}: ${monthRecords.length}건`;
+
+  if (monthRecords.length === 0) {
+    container.innerHTML = `<div class="empty-state">${ymText}에 등록된 예비비 내역이 없습니다.<br>위 폼에서 수입 및 지출 내역을 등록해 주세요.</div>`;
+    return;
+  }
+
+  monthRecords.forEach(item => {
+    const isIncome = item.type === 'income';
+    const typeBadge = isIncome
+      ? `<span class="type-badge income">+ 수입</span>`
+      : `<span class="type-badge expense">- 지출</span>`;
+
+    const amountColor = isIncome ? '#047857' : '#DC2626';
+    const sign = isIncome ? '+' : '-';
+
+    const imgs = getExpenseImages(item);
+    let receiptHtml = '';
+    if (imgs.length > 0) {
+      receiptHtml = `
+        <div class="receipt-thumbs-group">
+          <button type="button" class="receipt-thumb-btn" onclick="openExpenseGallery(${item.id})" title="영수증 확인 (총 ${imgs.length}장)">
+            <img src="${imgs[0]}" alt="영수증">
+            ${imgs.length > 1 ? `<span class="receipt-count-badge">+${imgs.length}</span>` : ''}
+          </button>
+        </div>
+      `;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'expense-item';
+    card.innerHTML = `
+      <div class="expense-item-main">
+        <div class="expense-desc-wrap">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+            ${typeBadge}
+            <span class="expense-desc">${item.desc}</span>
+          </div>
+          <div class="expense-amount" style="color: ${amountColor};">${sign} ${formatWon(item.amount)}</div>
+        </div>
+        ${receiptHtml}
+      </div>
+      <div class="expense-meta-row">
+        <div>
+          <span class="buyer-badge">처리자: ${item.person || '-'}</span>
+          <span style="margin-left: 6px;">${item.date}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button type="button" class="btn-action-icon" onclick="startEditReserveRecord(${item.id})">수정</button>
+          <button type="button" class="btn-action-icon del" onclick="deleteReserveRecord(${item.id})">삭제</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+let currentReserveReceiptDataUrls = [];
+
+window.handleReserveReceiptMultiSelect = function(inputEl) {
+  const files = Array.from(inputEl.files || []);
+  if (files.length === 0) return;
+
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      currentReserveReceiptDataUrls.push(evt.target.result);
+      loaded++;
+      if (loaded === files.length) {
+        renderReserveMultiPreview();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  inputEl.value = '';
+};
+
+function renderReserveMultiPreview() {
+  const strip = document.getElementById('reserveFormMultiPreviewStrip');
+  const clearBtn = document.getElementById('reserveBtnClearAllReceipts');
+  strip.innerHTML = '';
+
+  if (currentReserveReceiptDataUrls.length === 0) {
+    clearBtn.style.display = 'none';
+    return;
+  }
+
+  clearBtn.style.display = 'inline-block';
+  clearBtn.innerText = `영수증 전체 삭제 (${currentReserveReceiptDataUrls.length}장)`;
+
+  currentReserveReceiptDataUrls.forEach((url, idx) => {
+    const box = document.createElement('div');
+    box.className = 'multi-preview-thumb-box';
+    box.innerHTML = `
+      <img src="${url}" alt="영수증_${idx+1}" onclick="openModal('${url}', '영수증 ${idx+1}')">
+      <button type="button" class="btn-remove-single" onclick="removeSingleReserveReceipt(${idx})" title="삭제">✕</button>
+    `;
+    strip.appendChild(box);
+  });
+}
+
+window.removeSingleReserveReceipt = function(idx) {
+  currentReserveReceiptDataUrls.splice(idx, 1);
+  renderReserveMultiPreview();
+};
+
+window.clearAllReserveReceiptImages = function() {
+  currentReserveReceiptDataUrls = [];
+  const inputEl = document.getElementById('reserveReceipt');
+  if (inputEl) inputEl.value = '';
+  renderReserveMultiPreview();
+};
+
+window.handleSaveReserveRecord = function() {
+  const typeInput = document.getElementById('reserveType');
+  const amountInput = document.getElementById('reserveAmount');
+  const descInput = document.getElementById('reserveDesc');
+  const dateInput = document.getElementById('reserveDate');
+  const personInput = document.getElementById('reservePerson');
+  const errorMsg = document.getElementById('reserveErrorMsg');
+
+  const type = typeInput.value;
+  const amount = parseInt(amountInput.value, 10);
+  const desc = descInput.value.trim();
+  const date = dateInput.value;
+  const person = personInput.value.trim();
+
+  if (!desc || isNaN(amount) || amount <= 0 || !date || !person) {
+    errorMsg.style.display = 'block';
+    return;
+  }
+  errorMsg.style.display = 'none';
+
+  const finalImgs = [...currentReserveReceiptDataUrls];
+  const firstImg = finalImgs.length > 0 ? finalImgs[0] : "";
+
+  if (state.editingReserveRecordId) {
+    state.reserveRecords = state.reserveRecords.map(r => {
+      if (r.id === state.editingReserveRecordId) {
+        return {
+          ...r,
+          type,
+          amount,
+          desc,
+          date,
+          person,
+          receiptImgs: finalImgs,
+          receiptImg: firstImg
+        };
+      }
+      return r;
+    });
+  } else {
+    const newRecord = {
+      id: Date.now(),
+      type,
+      amount,
+      desc,
+      date,
+      person,
+      receiptImgs: finalImgs,
+      receiptImg: firstImg
+    };
+    state.reserveRecords.unshift(newRecord);
+  }
+
+  cancelReserveRecordEdit();
+  renderReserveManageView();
+  triggerAutoSave();
+};
+
+window.startEditReserveRecord = function(recordId) {
+  const r = (state.reserveRecords || []).find(it => it.id === recordId);
+  if (!r) return;
+
+  state.editingReserveRecordId = recordId;
+  document.getElementById('reserveType').value = r.type;
+  document.getElementById('reserveAmount').value = r.amount;
+  document.getElementById('reserveDesc').value = r.desc;
+  document.getElementById('reserveDate').value = r.date;
+  document.getElementById('reservePerson').value = r.person || '';
+
+  currentReserveReceiptDataUrls = getExpenseImages(r);
+  renderReserveMultiPreview();
+
+  document.getElementById('reserveFormTitle').innerText = '예비비 수입/지출 내역 수정';
+  document.getElementById('btnSubmitReserve').innerText = '수정 완료';
+  document.getElementById('btnCancelReserveEdit').style.display = 'inline-block';
+  document.getElementById('reserveFormCard').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.cancelReserveRecordEdit = function() {
+  state.editingReserveRecordId = null;
+  document.getElementById('reserveType').value = 'expense';
+  document.getElementById('reserveAmount').value = '';
+  document.getElementById('reserveDesc').value = '';
+  document.getElementById('reservePerson').value = '';
+  document.getElementById('reserveErrorMsg').style.display = 'none';
+  document.getElementById('reserveFormTitle').innerText = '+ 예비비 수입 / 지출 내역 등록';
+  document.getElementById('btnSubmitReserve').innerText = '내역 저장';
+  document.getElementById('btnCancelReserveEdit').style.display = 'none';
+  clearAllReserveReceiptImages();
+};
+
+window.deleteReserveRecord = function(recordId) {
+  state.reserveRecords = (state.reserveRecords || []).filter(it => it.id !== recordId);
+  renderReserveManageView();
+  triggerAutoSave();
+};
+
+// ==================== [기존 교회학교 로직 (100% 동일 유지)] ====================
 
 window.onVoucherAccountInputChange = function() {
   const bank = document.getElementById('vBankName').value || '';
@@ -2091,11 +2576,12 @@ function renderSnapshotList() {
     item.className = 'snapshot-item';
     const catCount = snap.data.categories ? snap.data.categories.length : 0;
     const expCount = snap.data.expenses ? snap.data.expenses.length : 0;
+    const resCount = snap.data.reserveRecords ? snap.data.reserveRecords.length : 0;
 
     item.innerHTML = `
       <div class="snapshot-info">
         <span class="snapshot-date"> ${snap.createdAt}</span>
-        <span class="snapshot-meta">${snap.title} · 항목 ${catCount}개 · 지출 ${expCount}건</span>
+        <span class="snapshot-meta">${snap.title} · 교회학교 항목 ${catCount}개 · 지출 ${expCount}건 · 예비비 ${resCount}건</span>
       </div>
       <div class="snapshot-actions">
         <button type="button" class="btn-backup primary" onclick="restoreFromSnapshot(${snap.id})">복원</button>
@@ -2119,7 +2605,8 @@ window.restoreFromSnapshot = function(snapshotId) {
   }
 
   closeRestoreModal();
-  renderCategoryListView();
+  switchManageScope(state.manageScope || 'school');
+
   if (state.currentSubCategoryId !== null) {
     renderSubExpenseList();
   }
@@ -2191,7 +2678,7 @@ window.importBackupFile = function(inputEl) {
         saveToLocalStorage();
         updateBackupCountBadge();
         renderSnapshotList();
-        renderCategoryListView();
+        switchManageScope(state.manageScope || 'school');
         renderVoucherPreview();
         renderReportPreviewTable();
         renderReceiptsView();
@@ -2277,7 +2764,11 @@ window.switchView = function(viewName) {
   if (viewName === 'manage') {
     manageArea.style.display = 'block';
     tabManage.classList.add('active');
-    renderCategoryListView();
+    if (state.manageScope === 'reserve') {
+      renderReserveManageView();
+    } else {
+      renderCategoryListView();
+    }
   } else if (viewName === 'voucher') {
     voucherArea.style.display = 'block';
     tabVoucher.classList.add('active');
@@ -2309,8 +2800,13 @@ function setYearMonth(ym) {
   state.selectedYearMonth = ym;
   document.getElementById('selectedMonthInput').value = ym;
   cancelCategoryEdit();
+  cancelReserveRecordEdit();
 
-  renderCategoryListView();
+  if (state.manageScope === 'reserve') {
+    renderReserveManageView();
+  } else {
+    renderCategoryListView();
+  }
 
   if (state.currentSubCategoryId !== null) {
     document.getElementById('subExpDate').value = `${ym}-01`;
@@ -2875,6 +3371,7 @@ window.deleteCategory = function(id) {
   triggerAutoSave();
 };
 
+// 결산보고서·지출결의서·영수증증빙 데이터 생성 (교회학교 지출만 연계, 예비비 완전 제외)
 function getReportData() {
   const currentYM = state.selectedYearMonth;
   const [yearStr, monthStr] = currentYM.split('-');
@@ -3026,11 +3523,7 @@ function renderVoucherPreview() {
   document.getElementById('vDateStr').innerText = formattedDateStr;
 }
 
-// [스마트 짝맞춤 2열 레이아웃 적용 + 영수증 미첨부 건도 포함]
-// 1. 영수증이 첨부되지 않은 세부지출건도 누락 없이 '영수증 미첨부' 카드로 렌더링
-// 2. 0~2장 지출건은 짝이 맞으면 좌/우 2열, 홀수 마지막 1건은 1줄 전체(100%) 차지
-// 3. 3장 이상 지출건은 항상 가로 100%
-// 4. 지출건마다 독립된 카드와 헤더 유지
+// 영수증 증빙 모아보기 (교회학교 지출만 연계)
 function renderReceiptsView() {
   const currentYM = state.selectedYearMonth;
   const ymText = formatYearMonthText(currentYM);
@@ -3046,13 +3539,13 @@ function renderReceiptsView() {
   container.innerHTML = '';
 
   const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
-  const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
+  const schoolCatIds = monthCats.map(c => c.id);
+  const monthExpenses = state.expenses.filter(e => schoolCatIds.includes(e.categoryId) && e.date.startsWith(currentYM));
 
-  // 영수증 첨부 유무와 상관없이 해당 월의 모든 지출 내역을 증빙 대상에 포함
   if (monthExpenses.length === 0) {
     container.innerHTML = `<div class="empty-state">
       ${ymText}에 등록된 지출 내역이 없습니다.<br>
-      [지출 관리] -> [세부내역 기입/관리]에서 지출 내역을 등록하시면 이곳에 지출건별 증빙 카드로 정리됩니다.
+      [지출 관리] -> [교회학교 지출 관리]에서 지출 내역을 등록하시면 이곳에 지출건별 증빙 카드로 정리됩니다.
     </div>`;
     return;
   }
@@ -3083,7 +3576,6 @@ function renderReceiptsView() {
     const cardsGrid = document.createElement('div');
     cardsGrid.className = 'receipt-cards-grid';
 
-    // 0~2장 지출건들의 개수 파악 (스마트 2열 짝맞춤)
     const smallCount = catExpenses.filter(e => getExpenseImages(e).length <= 2).length;
     let smallProcessedIndex = 0;
 
@@ -3094,12 +3586,8 @@ function renderReceiptsView() {
       let isSpanFull = false;
 
       if (imgs.length >= 3) {
-        // 3장 이상 대형 지출건은 항상 가로 100%
         isSpanFull = true;
       } else {
-        // 0~2장 지출건인 경우:
-        // 항목 내에 0~2장 지출건이 총 1개뿐이거나, 짝이 안 맞는 마지막 홀수 번째이면 1줄(가로 100%)을 채움!
-        // 짝이 맞는 경우에는 반폭(50%)씩 좌/우 2열로 쏙 들어감!
         smallProcessedIndex++;
         if (smallCount === 1 || (smallCount % 2 === 1 && smallProcessedIndex === smallCount)) {
           isSpanFull = true;
@@ -3117,7 +3605,6 @@ function renderReceiptsView() {
 
       let photosHtml = '';
       if (imgs.length === 0) {
-        // 영수증 미첨부 지출건 처리
         photosHtml = `
           <div class="receipt-no-photo-box">
             <span class="no-photo-icon"></span>
@@ -3165,11 +3652,14 @@ function renderReceiptsView() {
 }
 
 window.openExpenseGallery = function(expId) {
-  const item = state.expenses.find(e => e.id === expId);
+  let item = state.expenses.find(e => e.id === expId);
+  if (!item && Array.isArray(state.reserveRecords)) {
+    item = state.reserveRecords.find(r => r.id === expId);
+  }
   if (!item) return;
   const imgs = getExpenseImages(item);
   if (imgs.length > 0) {
-    openModal(imgs[0], `${item.desc} (1/${imgs.length})`);
+    openModal(imgs[0], `${item.desc || '영수증'} (1/${imgs.length})`);
   }
 };
 
@@ -3730,7 +4220,7 @@ xmlns:x="urn:schemas-microsoft-com:excel">
   downloadBlob(voucherXml, fileName, 'application/vnd.ms-excel;charset=utf-8;');
 };
 
-// [엑셀 MHTML 저장] 영수증 미첨부 지출건도 엑셀 증빙 테이블에 누락 없이 포함
+// [엑셀 MHTML 저장] 교회학교 지출만 증빙에 포함 (예비비 제외)
 window.downloadReceiptsExcelXml = function() {
   const currentYM = state.selectedYearMonth;
   const [yearStr, monthStr] = currentYM.split('-');
@@ -3739,7 +4229,8 @@ window.downloadReceiptsExcelXml = function() {
   const ymText = `${yearStr}년 ${monthNum}월`;
 
   const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
-  const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
+  const schoolCatIds = monthCats.map(c => c.id);
+  const monthExpenses = state.expenses.filter(e => schoolCatIds.includes(e.categoryId) && e.date.startsWith(currentYM));
 
   if (monthExpenses.length === 0) {
     alert(`${ymText}에 등록된 지출 내역이 없습니다.`);
@@ -3795,7 +4286,6 @@ window.downloadReceiptsExcelXml = function() {
       const spanCount = imgs.length;
 
       if (spanCount === 0) {
-        // 영수증 미첨부 지출건 엑셀 행
         tableRowsHtml += `
           <tr style="height: 100px;">
             <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${expIdx + 1}</td>
@@ -3977,7 +4467,7 @@ if (state.voucher) {
 }
 
 updateBackupCountBadge();
-renderCategoryListView();
+switchManageScope(state.manageScope || 'school');
 </script>
 </body>
 </html>
