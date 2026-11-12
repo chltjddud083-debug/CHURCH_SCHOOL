@@ -1,3 +1,6 @@
+
+최성영 <chltjddud083@poscofuturem.com>	2026년 11월 12일 오전 9:29
+받는사람: chltjddud083@gmail.com
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -1163,6 +1166,35 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   text-align: center;
 }
 
+/* 영수증 미첨부 안내 박스 스타일 */
+.receipt-no-photo-box {
+  border: 1.5px dashed #CBD5E1;
+  background-color: #F8FAFC;
+  border-radius: 4px;
+  height: 185px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #94A3B8;
+  box-sizing: border-box;
+}
+.receipt-no-photo-box .no-photo-icon {
+  font-size: 26px;
+  opacity: 0.8;
+}
+.receipt-no-photo-box .no-photo-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: -0.3px;
+}
+.receipt-no-photo-box .no-photo-sub {
+  font-size: 11px;
+  color: #94A3B8;
+}
+
 @media print {
   @page {
     size: A4 portrait;
@@ -1232,11 +1264,15 @@ button:focus-visible, input:focus-visible, select:focus-visible {
     page-break-after: avoid !important;
     break-after: avoid !important;
   }
-  .receipt-photo-box {
+  .receipt-photo-box, .receipt-no-photo-box {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
   .receipt-photo-box img {
+    height: 180px !important;
+    max-height: 180px !important;
+  }
+  .receipt-no-photo-box {
     height: 180px !important;
     max-height: 180px !important;
   }
@@ -1366,6 +1402,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
       <button type="button" class="btn-backup save-point" onclick="createManualBackup()"> 지금 시점 백업 저장</button>
       <button type="button" class="btn-backup" onclick="openRestoreModal()"> 백업 내역 (<span id="backupCountBadge">0</span>)</button>
       <button type="button" class="btn-backup primary" onclick="exportBackupFile()"> 파일저장 (.json)</button>
+      <button type="button" class="btn-backup" style="background-color: #FEE500; border-color: #FACC15; color: #191919;" onclick="shareBackupFile()"> 카톡 공유</button>
     </div>
   </div>
 
@@ -2130,6 +2167,43 @@ window.exportBackupFile = function() {
   const fileName = `광양교회_회계_백업_${deptName}_${ymTag}_${timeStamp}.json`;
 
   downloadBlob(jsonStr, fileName, 'application/json');
+};
+
+window.shareBackupFile = async function() {
+  const nowD = new Date();
+  const timeStamp = getFormattedStamp(nowD);
+  const deptName = state.selectedDept || '유초등부';
+  const ymTag = (state.selectedYearMonth || initYM).replace('-', '년_') + '월';
+
+  const exportData = {
+    system: "광양교회 교회학교 회계관리",
+    version: "v2.0",
+    exportDate: nowD.toISOString(),
+    currentState: state,
+    snapshots: backupSnapshots
+  };
+
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const fileName = `광양교회_회계_백업_${deptName}_${ymTag}_${timeStamp}.json`;
+  const file = new File([jsonStr], fileName, { type: 'application/json' });
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: `${deptName} ${ymTag} 회계 백업 파일`,
+        text: `[광양교회] ${deptName} ${ymTag} 회계 백업 데이터 파일입니다.`
+      });
+      showToast('카카오톡/외부 앱으로 공유되었습니다.');
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        exportBackupFile();
+      }
+    }
+  } else {
+    alert('모바일 기기에서는 카카오톡 선택창이 바로 열립니다.\n현재 환경(PC 등)에서는 백업 파일 저장으로 대체합니다.');
+    exportBackupFile();
+  }
 };
 
 window.importBackupFile = function(inputEl) {
@@ -2993,11 +3067,11 @@ function renderVoucherPreview() {
   document.getElementById('vDateStr').innerText = formattedDateStr;
 }
 
-// [스마트 짝맞춤 2열 레이아웃 적용]
-// 1. 해당 항목 내 1~2장 지출건이 2개 이상이면 2개씩 짝지어 1행에 좌/우 2열로 배치
-// 2. 만약 해당 항목 내 1~2장 지출건이 딱 1개뿐이거나, 짝이 안 맞는 마지막 1개는 가로 100%(span 2)로 꽉 채움
-// 3. 영수증이 3장 이상인 대형 지출건도 항상 가로 100%(span 2)로 넉넉히 배치
-// 4. 지출건마다 독립된 카드와 헤더([항목] 적요 / 일자 / 결제자 / 지출금액)를 유지하여 구별 100% 보장
+// [스마트 짝맞춤 2열 레이아웃 적용 + 영수증 미첨부 건도 포함]
+// 1. 영수증이 첨부되지 않은 세부지출건도 누락 없이 '영수증 미첨부' 카드로 렌더링
+// 2. 0~2장 지출건은 짝이 맞으면 좌/우 2열, 홀수 마지막 1건은 1줄 전체(100%) 차지
+// 3. 3장 이상 지출건은 항상 가로 100%
+// 4. 지출건마다 독립된 카드와 헤더 유지
 function renderReceiptsView() {
   const currentYM = state.selectedYearMonth;
   const ymText = formatYearMonthText(currentYM);
@@ -3014,24 +3088,27 @@ function renderReceiptsView() {
 
   const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
   const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
-  const expensesWithReceipt = monthExpenses.filter(e => getExpenseImages(e).length > 0);
 
-  if (expensesWithReceipt.length === 0) {
+  // 영수증 첨부 유무와 상관없이 해당 월의 모든 지출 내역을 증빙 대상에 포함
+  if (monthExpenses.length === 0) {
     container.innerHTML = `<div class="empty-state">
-      ${ymText}에 등록된 영수증 첨부 내역이 없습니다.<br>
-      [지출 관리] -> [세부내역 기입/관리]에서 영수증 사진을 첨부하시면 이곳에 지출건별 증빙 카드로 정리됩니다.
+      ${ymText}에 등록된 지출 내역이 없습니다.<br>
+      [지출 관리] -> [세부내역 기입/관리]에서 지출 내역을 등록하시면 이곳에 지출건별 증빙 카드로 정리됩니다.
     </div>`;
     return;
   }
 
   monthCats.forEach(cat => {
-    const catExpenses = expensesWithReceipt.filter(e => e.categoryId === cat.id);
+    const catExpenses = monthExpenses.filter(e => e.categoryId === cat.id);
     if (catExpenses.length === 0) return;
 
     let catTotalReceiptCount = 0;
     let catSubTotal = 0;
+    let catNoReceiptCount = 0;
     catExpenses.forEach(e => {
-      catTotalReceiptCount += getExpenseImages(e).length;
+      const imgLen = getExpenseImages(e).length;
+      catTotalReceiptCount += imgLen;
+      if (imgLen === 0) catNoReceiptCount++;
       catSubTotal += e.amount;
     });
 
@@ -3040,20 +3117,20 @@ function renderReceiptsView() {
 
     const groupHeader = document.createElement('div');
     groupHeader.className = 'receipt-category-title-bar';
-    groupHeader.innerText = ` 항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 총 ${catTotalReceiptCount}장 / 소계: ₩ ${formatNum(catSubTotal)})`;
+    const noReceiptTag = catNoReceiptCount > 0 ? ` · 미첨부 ${catNoReceiptCount}건` : '';
+    groupHeader.innerText = ` 항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 첨부 ${catTotalReceiptCount}장${noReceiptTag} / 소계: ₩ ${formatNum(catSubTotal)})`;
     groupSection.appendChild(groupHeader);
 
     const cardsGrid = document.createElement('div');
     cardsGrid.className = 'receipt-cards-grid';
 
-    // 해당 항목 내 1~2장 지출건들의 개수 파악
+    // 0~2장 지출건들의 개수 파악 (스마트 2열 짝맞춤)
     const smallCount = catExpenses.filter(e => getExpenseImages(e).length <= 2).length;
     let smallProcessedIndex = 0;
 
     catExpenses.forEach((item, expIdx) => {
       const imgs = getExpenseImages(item);
       const isMulti = imgs.length > 1;
-      const isSmall = imgs.length <= 2;
 
       let isSpanFull = false;
 
@@ -3061,9 +3138,9 @@ function renderReceiptsView() {
         // 3장 이상 대형 지출건은 항상 가로 100%
         isSpanFull = true;
       } else {
-        // 1~2장 지출건인 경우:
-        // 항목 내에 1~2장 지출건이 총 1개뿐이거나, 짝이 안 맞는 마지막 홀수 번째이면 1줄(가로 100%)을 채움!
-        // 짝이 맞는 경우에는 반폭(50%)씩 좌/우로 쏙 들어감!
+        // 0~2장 지출건인 경우:
+        // 항목 내에 0~2장 지출건이 총 1개뿐이거나, 짝이 안 맞는 마지막 홀수 번째이면 1줄(가로 100%)을 채움!
+        // 짝이 맞는 경우에는 반폭(50%)씩 좌/우 2열로 쏙 들어감!
         smallProcessedIndex++;
         if (smallCount === 1 || (smallCount % 2 === 1 && smallProcessedIndex === smallCount)) {
           isSpanFull = true;
@@ -3080,21 +3157,36 @@ function renderReceiptsView() {
       else if (imgs.length >= 3) gridColsClass = 'cols-3';
 
       let photosHtml = '';
-      imgs.forEach((imgUrl, imgIdx) => {
-        const badgeLabel = isMulti ? `영수증 (${imgIdx + 1}/${imgs.length})` : `영수증 증빙 (1장)`;
-        photosHtml += `
-          <div class="receipt-photo-box" onclick="openModal('${imgUrl}', '[${cat.name}] ${item.desc}${isMulti ? ` (${imgIdx+1}/${imgs.length})` : ''}')" title="클릭하여 원본 확대">
-            <img src="${imgUrl}" alt="영수증_${expIdx+1}_${imgIdx+1}">
-            <span class="receipt-photo-badge">${badgeLabel}</span>
+      if (imgs.length === 0) {
+        // 영수증 미첨부 지출건 처리
+        photosHtml = `
+          <div class="receipt-no-photo-box">
+            <span class="no-photo-icon"></span>
+            <span class="no-photo-text">영수증 미첨부</span>
+            <span class="no-photo-sub">세부 지출 등록 시 영수증이 첨부되지 않았습니다</span>
           </div>
         `;
-      });
+      } else {
+        imgs.forEach((imgUrl, imgIdx) => {
+          const badgeLabel = isMulti ? `영수증 (${imgIdx + 1}/${imgs.length})` : `영수증 증빙 (1장)`;
+          photosHtml += `
+            <div class="receipt-photo-box" onclick="openModal('${imgUrl}', '[${cat.name}] ${item.desc}${isMulti ? ` (${imgIdx+1}/${imgs.length})` : ''}')" title="클릭하여 원본 확대">
+              <img src="${imgUrl}" alt="영수증_${expIdx+1}_${imgIdx+1}">
+              <span class="receipt-photo-badge">${badgeLabel}</span>
+            </div>
+          `;
+        });
+      }
+
+      const attachBadge = imgs.length === 0
+        ? `<strong style="color: #EF4444;">미첨부</strong>`
+        : `<strong>${imgs.length}장</strong>`;
 
       card.innerHTML = `
         <div class="expense-group-header">
           <div class="expense-header-left">
             <span class="expense-title-text">[${cat.name}] ${item.desc}</span>
-            <span class="expense-meta-info">일자: <strong>${item.date}</strong> | 결제자: <strong>${item.buyer || '-'}</strong> | 첨부: <strong>${imgs.length}장</strong></span>
+            <span class="expense-meta-info">일자: <strong>${item.date}</strong> | 결제자: <strong>${item.buyer || '-'}</strong> | 첨부: ${attachBadge}</span>
           </div>
           <div class="expense-header-right">
             <span class="expense-amount-badge">지출액: ₩ ${formatNum(item.amount)}</span>
@@ -3171,7 +3263,7 @@ window.downloadExcelXml = function() {
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
 xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-xmlns:x="urn:schemas-microsoft-com:office:excel">
+xmlns:x="urn:schemas-microsoft-com:excel">
 <Styles>
   <Style ss:ID="Default" ss:Name="Normal">
    <Alignment ss:Vertical="Center" ss:ShrinkToFit="1"/>
@@ -3441,7 +3533,7 @@ window.downloadVoucherExcelXml = function() {
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
 xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-xmlns:x="urn:schemas-microsoft-com:office:excel">
+xmlns:x="urn:schemas-microsoft-com:excel">
 <Styles>
   <Style ss:ID="Default" ss:Name="Normal">
    <Alignment ss:Vertical="Center" ss:ShrinkToFit="1"/>
@@ -3679,7 +3771,7 @@ xmlns:x="urn:schemas-microsoft-com:office:excel">
   downloadBlob(voucherXml, fileName, 'application/vnd.ms-excel;charset=utf-8;');
 };
 
-// [엑셀 MHTML 저장 유지] 엑셀에서 열 때 멀티파트 인라인 이미지를 통해 사진이 엑스박스 없이 표시되도록 구성
+// [엑셀 MHTML 저장] 영수증 미첨부 지출건도 엑셀 증빙 테이블에 누락 없이 포함
 window.downloadReceiptsExcelXml = function() {
   const currentYM = state.selectedYearMonth;
   const [yearStr, monthStr] = currentYM.split('-');
@@ -3689,10 +3781,9 @@ window.downloadReceiptsExcelXml = function() {
 
   const monthCats = state.categories.filter(c => c.yearMonth === currentYM);
   const monthExpenses = state.expenses.filter(e => e.date.startsWith(currentYM));
-  const expensesWithReceipt = monthExpenses.filter(e => getExpenseImages(e).length > 0);
 
-  if (expensesWithReceipt.length === 0) {
-    alert(`${ymText}에 등록된 영수증 증빙 내역이 없습니다.`);
+  if (monthExpenses.length === 0) {
+    alert(`${ymText}에 등록된 지출 내역이 없습니다.`);
     return;
   }
 
@@ -3701,23 +3792,32 @@ window.downloadReceiptsExcelXml = function() {
   let tableRowsHtml = '';
   let totalProofSum = 0;
   let totalProofCount = 0;
+  let totalNoReceiptCount = 0;
   let imageCounter = 0;
 
   monthCats.forEach(cat => {
-    const catExpenses = expensesWithReceipt.filter(e => e.categoryId === cat.id);
+    const catExpenses = monthExpenses.filter(e => e.categoryId === cat.id);
     if (catExpenses.length === 0) return;
 
     const catSubTotal = catExpenses.reduce((sum, it) => sum + it.amount, 0);
     let catImgsCount = 0;
-    catExpenses.forEach(it => catImgsCount += getExpenseImages(it).length);
+    let catNoImgsCount = 0;
+    catExpenses.forEach(it => {
+      const cnt = getExpenseImages(it).length;
+      catImgsCount += cnt;
+      if (cnt === 0) catNoImgsCount++;
+    });
 
     totalProofSum += catSubTotal;
     totalProofCount += catImgsCount;
+    totalNoReceiptCount += catNoImgsCount;
+
+    const catExtraTag = catNoImgsCount > 0 ? ` · 미첨부 ${catNoImgsCount}건` : '';
 
     tableRowsHtml += `
       <tr style="background-color: #EFF6FF;">
         <th colspan="7" style="border: 2px solid #0F52BA; text-align: left; padding: 10px; font-size: 13pt; color: #0F52BA;">
-          항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 총 ${catImgsCount}장 / 소계: ₩ ${formatNum(catSubTotal)})
+          항목: ${cat.name} (${catExpenses.length}개 지출건 / 영수증 첨부 ${catImgsCount}장${catExtraTag} / 소계: ₩ ${formatNum(catSubTotal)})
         </th>
       </tr>
       <tr style="background-color: #F8FAFC;">
@@ -3735,58 +3835,80 @@ window.downloadReceiptsExcelXml = function() {
       const imgs = getExpenseImages(item);
       const spanCount = imgs.length;
 
-      imgs.forEach((imgUrl, imgIdx) => {
-        imageCounter++;
-        const contentLocation = `receipt_img_${imageCounter}.jpg`;
+      if (spanCount === 0) {
+        // 영수증 미첨부 지출건 엑셀 행
+        tableRowsHtml += `
+          <tr style="height: 100px;">
+            <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${expIdx + 1}</td>
+            <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.date}</td>
+            <td style="border: 1px solid #CBD5E1; text-align: left; vertical-align: middle; padding: 6px; background-color: #fff;">
+              <b>${item.desc}</b><br>
+              <span style="font-size: 9pt; color: #EF4444;">[영수증 미첨부]</span>
+            </td>
+            <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.buyer || '-'}</td>
+            <td style="border: 1px solid #CBD5E1; text-align: right; vertical-align: middle; font-weight: bold; font-size: 11pt; padding-right: 8px; background-color: #fff; color: #0F52BA;">
+              ₩ ${formatNum(item.amount)}
+            </td>
+            <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #94A3B8;">-</td>
+            <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #F8FAFC; color: #64748B; font-weight: bold;">
+              (영수증 미첨부 내역)
+            </td>
+          </tr>
+        `;
+      } else {
+        imgs.forEach((imgUrl, imgIdx) => {
+          imageCounter++;
+          const contentLocation = `receipt_img_${imageCounter}.jpg`;
 
-        let mime = 'image/jpeg';
-        let base64Pure = '';
-        const match = imgUrl.match(/^data:([^;]+);base64,(.+)$/);
-        if (match) {
-          mime = match[1];
-          base64Pure = match[2];
-        } else {
-          base64Pure = imgUrl;
-        }
+          let mime = 'image/jpeg';
+          let base64Pure = '';
+          const match = imgUrl.match(/^data:([^;]+);base64,(.+)$/);
+          if (match) {
+            mime = match[1];
+            base64Pure = match[2];
+          } else {
+            base64Pure = imgUrl;
+          }
 
-        imageParts.push(
-          `--${boundary}\r\n` +
-          `Content-Type: ${mime}\r\n` +
-          `Content-Transfer-Encoding: base64\r\n` +
-          `Content-Location: ${contentLocation}\r\n\r\n` +
-          `${base64Pure}\r\n`
-        );
+          imageParts.push(
+            `--${boundary}\r\n` +
+            `Content-Type: ${mime}\r\n` +
+            `Content-Transfer-Encoding: base64\r\n` +
+            `Content-Location: ${contentLocation}\r\n\r\n` +
+            `${base64Pure}\r\n`
+          );
 
-        if (imgIdx === 0) {
-          tableRowsHtml += `
-            <tr style="height: 180px;">
-              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${expIdx + 1}</td>
-              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.date}</td>
-              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: left; vertical-align: middle; padding: 6px; background-color: #fff;">
-                <b>${item.desc}</b><br>
-                <span style="font-size: 9pt; color: #64748B;">(첨부 영수증 총 ${spanCount}장)</span>
-              </td>
-              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.buyer || '-'}</td>
-              <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: right; vertical-align: middle; font-weight: bold; font-size: 11pt; padding-right: 8px; background-color: #fff; color: #0F52BA;">
-                ₩ ${formatNum(item.amount)}
-              </td>
-              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
-              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
-                <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
-              </td>
-            </tr>
-          `;
-        } else {
-          tableRowsHtml += `
-            <tr style="height: 180px;">
-              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
-              <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
-                <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
-              </td>
-            </tr>
-          `;
-        }
-      });
+          if (imgIdx === 0) {
+            tableRowsHtml += `
+              <tr style="height: 180px;">
+                <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${expIdx + 1}</td>
+                <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.date}</td>
+                <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: left; vertical-align: middle; padding: 6px; background-color: #fff;">
+                  <b>${item.desc}</b><br>
+                  <span style="font-size: 9pt; color: #64748B;">(첨부 영수증 총 ${spanCount}장)</span>
+                </td>
+                <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; background-color: #fff;">${item.buyer || '-'}</td>
+                <td rowspan="${spanCount}" style="border: 1px solid #CBD5E1; text-align: right; vertical-align: middle; font-weight: bold; font-size: 11pt; padding-right: 8px; background-color: #fff; color: #0F52BA;">
+                  ₩ ${formatNum(item.amount)}
+                </td>
+                <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
+                <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
+                  <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
+                </td>
+              </tr>
+            `;
+          } else {
+            tableRowsHtml += `
+              <tr style="height: 180px;">
+                <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; font-size: 9.5pt; color: #475569;">${imgIdx + 1}/${spanCount}</td>
+                <td style="border: 1px solid #CBD5E1; text-align: center; vertical-align: middle; padding: 6px; background-color: #FAFAFA;">
+                  <img src="${contentLocation}" width="290" height="165" style="width: 290px; height: 165px; object-fit: contain; display: block; margin: 0 auto;" alt="영수증_${imageCounter}">
+                </td>
+              </tr>
+            `;
+          }
+        });
+      }
     });
 
     tableRowsHtml += `<tr><td colspan="7" style="height: 14px;"></td></tr>`;
@@ -3830,13 +3952,13 @@ window.downloadReceiptsExcelXml = function() {
         </tr>
         <tr>
           <td colspan="7" style="text-align: center; color: #475569; font-size: 11pt; padding-bottom: 12px;">
-            부서: ${deptName} | 대상연월: ${ymText} | 출력일시: ${todayStr} | 영수증 총 ${totalProofCount}장
+            부서: ${deptName} | 대상연월: ${ymText} | 출력일시: ${todayStr} | 영수증 총 ${totalProofCount}장${totalNoReceiptCount > 0 ? ` (미첨부 ${totalNoReceiptCount}건)` : ''}
           </td>
         </tr>
         ${tableRowsHtml}
         <tr style="background-color: #F1F5F9; height: 35px;">
           <th colspan="4" style="border: 2px solid #000; text-align: center; font-size: 12pt;">
-            영수증 첨부 증빙 합계 총액 (총 ${totalProofCount}장)
+            결산 지출 증빙 합계 총액 (${monthExpenses.length}건, 영수증 ${totalProofCount}장)
           </th>
           <th colspan="3" style="border: 2px solid #000; text-align: right; font-size: 13pt; color: #0F52BA; padding-right: 14px;">
             ₩ ${formatNum(totalProofSum)}
