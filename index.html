@@ -1,6 +1,3 @@
-
-최성영 <chltjddud083@poscofuturem.com>	2026년 11월 12일 오전 9:29
-받는사람: chltjddud083@gmail.com
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -1402,7 +1399,6 @@ button:focus-visible, input:focus-visible, select:focus-visible {
       <button type="button" class="btn-backup save-point" onclick="createManualBackup()"> 지금 시점 백업 저장</button>
       <button type="button" class="btn-backup" onclick="openRestoreModal()"> 백업 내역 (<span id="backupCountBadge">0</span>)</button>
       <button type="button" class="btn-backup primary" onclick="exportBackupFile()"> 파일저장 (.json)</button>
-      <button type="button" class="btn-backup" style="background-color: #FEE500; border-color: #FACC15; color: #191919;" onclick="shareBackupFile()"> 카톡 공유</button>
     </div>
   </div>
 
@@ -2167,43 +2163,6 @@ window.exportBackupFile = function() {
   const fileName = `광양교회_회계_백업_${deptName}_${ymTag}_${timeStamp}.json`;
 
   downloadBlob(jsonStr, fileName, 'application/json');
-};
-
-window.shareBackupFile = async function() {
-  const nowD = new Date();
-  const timeStamp = getFormattedStamp(nowD);
-  const deptName = state.selectedDept || '유초등부';
-  const ymTag = (state.selectedYearMonth || initYM).replace('-', '년_') + '월';
-
-  const exportData = {
-    system: "광양교회 교회학교 회계관리",
-    version: "v2.0",
-    exportDate: nowD.toISOString(),
-    currentState: state,
-    snapshots: backupSnapshots
-  };
-
-  const jsonStr = JSON.stringify(exportData, null, 2);
-  const fileName = `광양교회_회계_백업_${deptName}_${ymTag}_${timeStamp}.json`;
-  const file = new File([jsonStr], fileName, { type: 'application/json' });
-
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({
-        files: [file],
-        title: `${deptName} ${ymTag} 회계 백업 파일`,
-        text: `[광양교회] ${deptName} ${ymTag} 회계 백업 데이터 파일입니다.`
-      });
-      showToast('카카오톡/외부 앱으로 공유되었습니다.');
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        exportBackupFile();
-      }
-    }
-  } else {
-    alert('모바일 기기에서는 카카오톡 선택창이 바로 열립니다.\n현재 환경(PC 등)에서는 백업 파일 저장으로 대체합니다.');
-    exportBackupFile();
-  }
 };
 
 window.importBackupFile = function(inputEl) {
